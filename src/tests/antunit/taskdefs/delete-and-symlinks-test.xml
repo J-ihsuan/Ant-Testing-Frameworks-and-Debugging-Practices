@@ -54,8 +54,10 @@
   <target name="testRemoveNotFollowedLinkHonorsIncludesOnFiles"
           depends="setUp" if="canCreateSymlink"
           description="https://issues.apache.org/bugzilla/show_bug.cgi?id=53959">
+    <delete link="${link}"/>
     <delete dir="${input}/C"/>
     <touch file="${input}/C"/>
+    <symlink link="${link}" resource="${input}/C"/>
     <delete removeNotFollowedSymlinks="true">
       <fileset dir="${input}/A" followSymlinks="false" includes="**/D"/>
     </delete>
