@@ -66,4 +66,33 @@
     </delete>
     <au:assertFileExists file="${input}/A/B/C"/>
   </target>
+
+  <target name="prepare-dangling-tests">
+    <property name="existing.dir" location="${output}/exists"/>
+    <delete dir="${output}"/>
+    <mkdir dir="${output}"/>
+    <mkdir dir="${existing.dir}"/>
+  </target>
+
+  <target name="testDanglingJunctionInDir" if="windows_os"
+          depends="prepare-dangling-tests">
+    <mkdir dir="${output}/foo"/>
+    <mklink link="${existing.dir}/link" targetFile="${output}/foo"/>
+    <delete dir="${output}/foo"/>
+    <delete dir="${existing.dir}"/>
+    <au:assertFileDoesntExist file="${existing.dir}" />
+  </target>
+
+  <target name="testDanglingJunction" if="windows_os"
+          depends="prepare-dangling-tests">
+    <mkdir dir="${output}/foo"/>
+    <mklink link="${existing.dir}/link" targetFile="${output}/foo"/>
+    <delete dir="${output}/foo"/>
+    <delete dir="${output}/link"/>
+
+    <!-- since File.exists returns false for dangling links, recreate
+         the file so that assertFileDoesntExist can actually work -->
+    <mkdir dir="${output}/foo"/>
+    <au:assertFileDoesntExist file="${output}/link" />
+  </target>
 </project>
