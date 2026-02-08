@@ -214,7 +214,7 @@ Note: This document was adapted from the one created in the context of
     And then build and publish
 
       $ snapcraft clean
-      $ snapcraft snap
+      $ snapcraft pack
       $ snapcraft upload --release=candidate ant_*.snap
 
     This will publish the new release snap to the latest track on the

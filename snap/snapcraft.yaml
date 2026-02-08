@@ -15,7 +15,16 @@
 
 name: ant
 version: "1.10.16alpha"
+title: Apache Ant
 summary: Apache Ant
+contact:
+  - https://ant.apache.org/mail.html
+issues:
+  - https://ant.apache.org/bugs.html
+website:
+  - https://ant.apache.org/
+source-code:
+  - https://ant.apache.org/git.html
 description: |
   Apache Ant™ is a Java library and command-line tool whose mission is
   to drive processes described in build files as targets and extension
