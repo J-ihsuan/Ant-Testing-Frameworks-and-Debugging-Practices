@@ -505,7 +505,7 @@
   </details>
 
   ### 2.3 \<Delete\> Class Coverage Summary
-  The [**Delete**](https://github.com/J-ihsuan/Apache-Ant-Testing-Frameworks-and-Debugging-Practices/blob/main/ApacheAnt/src/main/org/apache/tools/ant/taskdefs/Delete.java) class is currently a weak point in the test suite, falling below the project average.  
+  The [**Delete**](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/098077beda8accd6a3453f6058214c6991ad8eae/src/main/org/apache/tools/ant/taskdefs/Delete.java) class is currently a weak point in the test suite, falling below the project average.  
   The method coverage is the most critical metric, indicating that more than half of the methods in this class are never invoked by any test.
 
   |                  | Total | Missed | Covered | Coverage % | 
@@ -529,7 +529,7 @@
   ----
 
   ### 2.4 \<Mail\> Function Coverage Summary
-  The [**Mail**](https://github.com/J-ihsuan/Apache-Ant-Testing-Frameworks-and-Debugging-Practices/tree/main/ApacheAnt/src/main/org/apache/tools/mail) function demonstrates strong test reliability, significantly outperforming the project average. The 85% instruction and 88% method coverage are excellent, showing that the primary functionality is well-tested.
+  The [**Mail**](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/tree/098077beda8accd6a3453f6058214c6991ad8eae/src/main/org/apache/tools/mail) function demonstrates strong test reliability, significantly outperforming the project average. The 85% instruction and 88% method coverage are excellent, showing that the primary functionality is well-tested.
   |                  | Total | Missed | Covered | Coverage % | 
   |:----------------:|:-----:|:------:|:-------:|:----------:|
   | **Instructions** | 697  | 99 | 598 | 85%     | 
@@ -539,7 +539,7 @@
   | **Classes**      | 4    | 1  | 3   | 75%     |
 
   **Uncovered Part**  
-  1. The [**ErrorInQuitException**](https://github.com/J-ihsuan/Apache-Ant-Testing-Frameworks-and-Debugging-Practices/blob/main/ApacheAnt/src/main/org/apache/tools/mail/ErrorInQuitException.java) class is missed. The tests never trigger the error condition that occurs during the SMTP `QUIT` command.
+  1. The [**ErrorInQuitException**](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/098077beda8accd6a3453f6058214c6991ad8eae/src/main/org/apache/tools/mail/ErrorInQuitException.java) class is missed. The tests never trigger the error condition that occurs during the SMTP `QUIT` command.
   2. In the [**MailMessage**](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/098077beda8accd6a3453f6058214c6991ad8eae/src/main/org/apache/tools/mail/MailMessage.java) class, the alternative Constructors `MailMessage()`, `MailMessage(String)` and `setPort(int)` are never used. The tests use the `MailMessage(String, int)` constructor.
   <details>
     <summary>Click to View Detail Report of Mail</summary>
@@ -633,27 +633,27 @@ The `ExecuteOn` class represents a significant gap in the current test suite. It
 ----
 
 ### 3.1 \<Delete> Coverage Test  (Author: Eleanor)
-White-box testing of Delete class focusing on internal method execution, implicit logical operators, and complex integration with the [`selectors`](https://github.com/J-ihsuan/Apache-Ant-Testing-Frameworks-and-Debugging-Practices/tree/e_branch/ApacheAnt/src/main/org/apache/tools/ant/types/selectors) package.
+White-box testing of Delete class focusing on internal method execution, implicit logical operators, and complex integration with the [`selectors`](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/tree/098077beda8accd6a3453f6058214c6991ad8eae/src/main/org/apache/tools/ant/types/selectors) package.
 
 **Test File** 
-  * [`DeleteWhiteBoxTest.java`](https://github.com/J-ihsuan/Apache-Ant-Testing-Frameworks-and-Debugging-Practices/blob/e_branch/ApacheAnt/src/tests/junit/org/apache/tools/ant/taskdefs/DeleteWhiteBoxTest.java)
+  * [`DeleteWhiteBoxTest.java`](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/098077beda8accd6a3453f6058214c6991ad8eae/src/tests/junit/org/apache/tools/ant/taskdefs/DeleteWhiteBoxTest.java)
 
 
 **Associated Component**
-* [`removeFiles(File d, String[] f, String[] d)`](https://github.com/J-ihsuan/Apache-Ant-Testing-Frameworks-and-Debugging-Practices/blob/e_branch/ApacheAnt/src/main/org/apache/tools/ant/taskdefs/Delete.java#L839-L876): Low-level file and directory array processing.
-* [`setCaseSensitive(boolean)`](https://github.com/J-ihsuan/Apache-Ant-Testing-Frameworks-and-Debugging-Practices/blob/e_branch/ApacheAnt/src/main/org/apache/tools/ant/taskdefs/Delete.java#L363-L366): Configuration for path-matching case sensitivity.
-* [`createInclude()`](https://github.com/J-ihsuan/Apache-Ant-Testing-Frameworks-and-Debugging-Practices/blob/e_branch/ApacheAnt/src/main/org/apache/tools/ant/taskdefs/Delete.java#L250-L253), [`createExclude()`](https://github.com/J-ihsuan/Apache-Ant-Testing-Frameworks-and-Debugging-Practices/blob/e_branch/ApacheAnt/src/main/org/apache/tools/ant/taskdefs/Delete.java#L270-L273): Internal `PatternSet` builder methods.
+* [`removeFiles(File d, String[] f, String[] d)`](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/098077beda8accd6a3453f6058214c6991ad8eae/src/main/org/apache/tools/ant/taskdefs/Delete.java#L839-L876): Low-level file and directory array processing.
+* [`setCaseSensitive(boolean)`](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/098077beda8accd6a3453f6058214c6991ad8eae/src/main/org/apache/tools/ant/taskdefs/Delete.java#L363-L366): Configuration for path-matching case sensitivity.
+* [`createInclude()`](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/098077beda8accd6a3453f6058214c6991ad8eae/src/main/org/apache/tools/ant/taskdefs/Delete.java#L250-L253), [`createExclude()`](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/098077beda8accd6a3453f6058214c6991ad8eae/src/main/org/apache/tools/ant/taskdefs/Delete.java#L270-L273): Internal `PatternSet` builder methods.
 * Selector Registration Methods: `addFilename()`, `addContains()`, `addNot()`, `addPresent()`, `addDepth()`, `addSize()`, `addOr()`, and `addAnd()`.
 
 **Test Case**
 | Test | Scenario | Functionality Tested | Behavioral Verification |
 | :--- | :--- | :--- | :--- |
-| [`testRemoveFilesDirectly()`](https://github.com/J-ihsuan/Apache-Ant-Testing-Frameworks-and-Debugging-Practices/blob/e_branch/ApacheAnt/src/tests/junit/org/apache/tools/ant/taskdefs/DeleteWhiteBoxTest.java#L52-L84) | Direct Invocation of `removeFiles()` | Internal mechanism for files & directories deletion. | By bypassing the `DirectoryScanner` and injecting hardcoded string arrays (simulating scanner output), this test ensures that the `Delete` task correctly processes isolated arrays of file and directory paths, removing only what is specified and preserving adjacent files. |
-| [`testDeleteByContentAndFilename()`](https://github.com/J-ihsuan/Apache-Ant-Testing-Frameworks-and-Debugging-Practices/blob/e_branch/ApacheAnt/src/tests/junit/org/apache/tools/ant/taskdefs/DeleteWhiteBoxTest.java#L95-L131) | Content & Filename Deletion (Multi Selectors) | Implicit logical intersection AND when multiple selectors are added directly. | Ensures a file is deleted only if it meets **all** conditions simultaneously (e.g., content contains "ERROR" AND name matches `*.txt`). |
-| [`testDeleteUsingNestedPatterns()`](https://github.com/J-ihsuan/Apache-Ant-Testing-Frameworks-and-Debugging-Practices/blob/e_branch/ApacheAnt/src/tests/junit/org/apache/tools/ant/taskdefs/DeleteWhiteBoxTest.java#L140-L159) | Pattern Builder Integration (`PatternSet`) | Internal handling of standard include/exclude patterns. | Validates that `PatternSet.NameEntry` objects correctly target standard files (e.g., `*.class`) for deletion while strictly protecting excluded patterns (e.g., `*Test*`). |
-| [`testCaseInsensitiveAndNotSelector()`](https://github.com/J-ihsuan/Apache-Ant-Testing-Frameworks-and-Debugging-Practices/blob/e_branch/ApacheAnt/src/tests/junit/org/apache/tools/ant/taskdefs/DeleteWhiteBoxTest.java#L168-L196)| Case-Insensitive Deletion with NOT | Interaction between case-blind configuration and `NotSelector`. | Proves `caseSensitive=false` targets files regardless of casing (e.g., `.TXT` vs `.txt`), while a `NotSelector` successfully overrides this to protect specific files. |
-| [`testCrossDirectoryPresenceCleanup()`](https://github.com/J-ihsuan/Apache-Ant-Testing-Frameworks-and-Debugging-Practices/blob/e_branch/ApacheAnt/src/tests/junit/org/apache/tools/ant/taskdefs/DeleteWhiteBoxTest.java#L205-L237) | Cross-Directory Cleanup | Advanced filesystem state checks across different directory structures. | Uses `PresentSelector` and `IdentityMapper` to check a secondary `src` directory; ensures files in `build` directory are only deleted if their equivalent counterpart still exists in `src`. |
-| [`testDeepSmallLogOrTmpCleanup()`](https://github.com/J-ihsuan/Apache-Ant-Testing-Frameworks-and-Debugging-Practices/blob/e_branch/ApacheAnt/src/tests/junit/org/apache/tools/ant/taskdefs/DeleteWhiteBoxTest.java#L249-L310) | Multi-Dimensional Constraint Filtering | Aggregated selector logic combining structural, physical, and metadata conditions. |  Validates a complex, real-world maintenance scenario. It ensures a file is only deleted if it is buried in a subdirectory (Depth >= 1), falls beneath a specific file size threshold (Size < 50 bytes), and matches at least one of two file extensions (using logical OR). |
+| [`testRemoveFilesDirectly()`](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/098077beda8accd6a3453f6058214c6991ad8eae/src/tests/junit/org/apache/tools/ant/taskdefs/DeleteWhiteBoxTest.java#L52-L84) | Direct Invocation of `removeFiles()` | Internal mechanism for files & directories deletion. | By bypassing the `DirectoryScanner` and injecting hardcoded string arrays (simulating scanner output), this test ensures that the `Delete` task correctly processes isolated arrays of file and directory paths, removing only what is specified and preserving adjacent files. |
+| [`testDeleteByContentAndFilename()`](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/098077beda8accd6a3453f6058214c6991ad8eae/src/tests/junit/org/apache/tools/ant/taskdefs/DeleteWhiteBoxTest.java#L95-L131) | Content & Filename Deletion (Multi Selectors) | Implicit logical intersection AND when multiple selectors are added directly. | Ensures a file is deleted only if it meets **all** conditions simultaneously (e.g., content contains "ERROR" AND name matches `*.txt`). |
+| [`testDeleteUsingNestedPatterns()`](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/098077beda8accd6a3453f6058214c6991ad8eae/src/tests/junit/org/apache/tools/ant/taskdefs/DeleteWhiteBoxTest.java#L140-L159) | Pattern Builder Integration (`PatternSet`) | Internal handling of standard include/exclude patterns. | Validates that `PatternSet.NameEntry` objects correctly target standard files (e.g., `*.class`) for deletion while strictly protecting excluded patterns (e.g., `*Test*`). |
+| [`testCaseInsensitiveAndNotSelector()`](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/098077beda8accd6a3453f6058214c6991ad8eae/src/tests/junit/org/apache/tools/ant/taskdefs/DeleteWhiteBoxTest.java#L168-L196)| Case-Insensitive Deletion with NOT | Interaction between case-blind configuration and `NotSelector`. | Proves `caseSensitive=false` targets files regardless of casing (e.g., `.TXT` vs `.txt`), while a `NotSelector` successfully overrides this to protect specific files. |
+| [`testCrossDirectoryPresenceCleanup()`](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/098077beda8accd6a3453f6058214c6991ad8eae/src/tests/junit/org/apache/tools/ant/taskdefs/DeleteWhiteBoxTest.java#L205-L237) | Cross-Directory Cleanup | Advanced filesystem state checks across different directory structures. | Uses `PresentSelector` and `IdentityMapper` to check a secondary `src` directory; ensures files in `build` directory are only deleted if their equivalent counterpart still exists in `src`. |
+| [`testDeepSmallLogOrTmpCleanup()`](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/098077beda8accd6a3453f6058214c6991ad8eae/src/tests/junit/org/apache/tools/ant/taskdefs/DeleteWhiteBoxTest.java#L249-L310) | Multi-Dimensional Constraint Filtering | Aggregated selector logic combining structural, physical, and metadata conditions. |  Validates a complex, real-world maintenance scenario. It ensures a file is only deleted if it is buried in a subdirectory (Depth >= 1), falls beneath a specific file size threshold (Size < 50 bytes), and matches at least one of two file extensions (using logical OR). |
 
  **Test Implementation**
 
