@@ -257,7 +257,7 @@
 
   **Why it lends itself to FSM Modeling:**
 
-  Analysis of **Copy.java** identifies a state-dependent lifecycle with the following key characteristics:
+  Analysis of [**Copy.java**](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/master/src/main/org/apache/tools/ant/taskdefs/Copy.java) identifies a state-dependent lifecycle with the following key characteristics:
 
   - **Strict State Sequencing:** The task must pass through a Validation phase before any file operations occur. If the attributes (like file or todir) are invalid, the task terminates immediately via a BuildException or a strategic return, ensuring that the system never enters an unstable Execution state with invalid parameters.
 
@@ -303,14 +303,14 @@
   To validate the FSM model, I implemented **Transition Coverage testing** using **JUnit 4**. These tests ensure that the <copy\> task transitions correctly between states under both valid and invalid conditions.
 
   **a. Test Cases and Path Coverage:**
-  - [`testFullSuccessPath`](https://github.com/J-ihsuan/Apache-Ant-Testing-Frameworks-and-Debugging-Practices/blob/e869b959aaa478f0ca64d6f78b95a0f82c668a79/ApacheAnt/src/tests/junit/org/apache/tools/ant/taskdefs/CarolCopyFsmTest.java#L35C5-L46C6): Validates the transition `IDLE` -> `VALIDATING` -> `SCANNING` -> `PREPARING` -> `COPYING` -> `FINISHED`. It confirms that valid files are moved and the process ends successfully.
+  - [`testFullSuccessPath`](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/afb6ab9de7ba2fac5537bec9ab1670d15b9a65de/src/tests/junit/org/apache/tools/ant/taskdefs/CarolCopyFsmTest.java#L35-L46): Validates the transition `IDLE` -> `VALIDATING` -> `SCANNING` -> `PREPARING` -> `COPYING` -> `FINISHED`. It confirms that valid files are moved and the process ends successfully.
 
-  - [`testMissingDestDir`](https://github.com/J-ihsuan/Apache-Ant-Testing-Frameworks-and-Debugging-Practices/blob/e869b959aaa478f0ca64d6f78b95a0f82c668a79/ApacheAnt/src/tests/junit/org/apache/tools/ant/taskdefs/CarolCopyFsmTest.java#L52-L58): Validates the transition `VALIDATING` -> `FAILED`. It confirms the task throws a `BuildException` when a mandatory attribute is missing.
+  - [`testMissingDestDir`](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/afb6ab9de7ba2fac5537bec9ab1670d15b9a65de/src/tests/junit/org/apache/tools/ant/taskdefs/CarolCopyFsmTest.java#L53-L58): Validates the transition `VALIDATING` -> `FAILED`. It confirms the task throws a `BuildException` when a mandatory attribute is missing.
 
-  - [`testSourceFileMissing`](https://github.com/J-ihsuan/Apache-Ant-Testing-Frameworks-and-Debugging-Practices/blob/e869b959aaa478f0ca64d6f78b95a0f82c668a79/ApacheAnt/src/tests/junit/org/apache/tools/ant/taskdefs/CarolCopyFsmTest.java#L64-L73): Validates the transition `SCANNING` -> `FAILED`. It ensures the system correctly halts when the source resource cannot be located.
+  - [`testSourceFileMissing`](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/afb6ab9de7ba2fac5537bec9ab1670d15b9a65de/src/tests/junit/org/apache/tools/ant/taskdefs/CarolCopyFsmTest.java#L64-L73): Validates the transition `SCANNING` -> `FAILED`. It ensures the system correctly halts when the source resource cannot be located.
 
   **b. Implementation Details:**
-  - Test File: [CarolCopyFsmTest.java](https://github.com/J-ihsuan/Apache-Ant-Testing-Frameworks-and-Debugging-Practices/blob/c_branch/ApacheAnt/src/tests/junit/org/apache/tools/ant/taskdefs/CarolCopyFsmTest.java)
+  - Test File: [CarolCopyFsmTest.java](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/master/src/tests/junit/org/apache/tools/ant/taskdefs/CarolCopyFsmTest.java#L64-L73)
   - Execution Command:
     ```
     cd ApacheAnt
@@ -697,17 +697,17 @@ White-box testing of Delete class focusing on internal method execution, implici
   To address the identified gaps in the `Move` class, specifically the lack of testing for error handling and the garbage collection (GC) recovery mechanism, I implemented a new test class `MoveTest.java` (specifically the `testMoveCoverageEnhancementCarol` and `testMoveFolderWithFilters` methods).
 
   **Test File**
-  - [`MoveTest.java`](https://github.com/J-ihsuan/Apache-Ant-Testing-Frameworks-and-Debugging-Practices/blob/c_branch/ApacheAnt/src/tests/junit/org/apache/tools/ant/taskdefs/MoveTest.java)
+  - [`MoveTest.java`](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/master/src/tests/junit/org/apache/tools/ant/taskdefs/MoveTest.java)
 
   **Associated Component**
-  * [`renameFile`](https://github.com/J-ihsuan/Apache-Ant-Testing-Frameworks-and-Debugging-Practices/blob/391b27ebd48cc714c5017e1075cabf49e23ef7ca/ApacheAnt/src/main/org/apache/tools/ant/taskdefs/Move.java#L340-L358): Core logic for renaming files with fallback mechanisms.
-  * [`setPerformGcOnFailedDelete`](https://github.com/J-ihsuan/Apache-Ant-Testing-Frameworks-and-Debugging-Practices/blob/391b27ebd48cc714c5017e1075cabf49e23ef7ca/ApacheAnt/src/main/org/apache/tools/ant/taskdefs/Move.java#L77-L97): Configuration to trigger System GC (Improved from 0% to 100% coverage).
+  * [`renameFile`](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/afb6ab9de7ba2fac5537bec9ab1670d15b9a65de/src/main/org/apache/tools/ant/taskdefs/Move.java#L340-L358): Core logic for renaming files with fallback mechanisms.
+  * [`setPerformGcOnFailedDelete`](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/afb6ab9de7ba2fac5537bec9ab1670d15b9a65de/src/main/org/apache/tools/ant/taskdefs/Move.java#L77-L97): Configuration to trigger System GC (Improved from 0% to 100% coverage).
 
 **\<Move> Test Case**
 | Test | Scenario | Functionality Tested | Behavioral Verification |
 | :--- | :--- | :--- | :--- |
-| [`testMoveCoverageEnhancementCarol()`](https://github.com/J-ihsuan/Apache-Ant-Testing-Frameworks-and-Debugging-Practices/blob/391b27ebd48cc714c5017e1075cabf49e23ef7ca/ApacheAnt/src/tests/junit/org/apache/tools/ant/taskdefs/MoveTest.java#L49-L133) | **Fault Tolerance & GC Recovery** (Compound Test) | Fallback logic (`renameFile`) & System GC triggering (`setPerformGcOnFailedDelete`). | **(1) Rename Fallback:** Utilizes a `MoveSpy` to force `renameFile` to return `false`. This verifies that the task correctly switches to the "copy-and-delete" strategy when the OS refuses a simple rename.<br>**(2) GC Logic:** Simulates a file-lock scenario during deletion. Verifies that enabling `setPerformGcOnFailedDelete(true)` correctly triggers a `System.gc()` attempt to release file handles. |
-| [`testMoveFolderWithFilters()`](https://github.com/J-ihsuan/Apache-Ant-Testing-Frameworks-and-Debugging-Practices/blob/391b27ebd48cc714c5017e1075cabf49e23ef7ca/ApacheAnt/src/tests/junit/org/apache/tools/ant/taskdefs/MoveTest.java#L144-L165) | **Filtered Directory Move** | Integration of `FilterSet` application and directory flattening. | Configures a `Move` task with active `FilterSets` and `flatten=true`. Verifies that the task correctly processes content filtering (replacing tokens) while simultaneously restructuring the directory hierarchy (flattening) during the move operation. |
+| [`testMoveCoverageEnhancementCarol()`](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/afb6ab9de7ba2fac5537bec9ab1670d15b9a65de/src/tests/junit/org/apache/tools/ant/taskdefs/MoveTest.java#L49-L133) | **Fault Tolerance & GC Recovery** (Compound Test) | Fallback logic (`renameFile`) & System GC triggering (`setPerformGcOnFailedDelete`). | **(1) Rename Fallback:** Utilizes a `MoveSpy` to force `renameFile` to return `false`. This verifies that the task correctly switches to the "copy-and-delete" strategy when the OS refuses a simple rename.<br>**(2) GC Logic:** Simulates a file-lock scenario during deletion. Verifies that enabling `setPerformGcOnFailedDelete(true)` correctly triggers a `System.gc()` attempt to release file handles. |
+| [`testMoveFolderWithFilters()`](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/afb6ab9de7ba2fac5537bec9ab1670d15b9a65de/src/tests/junit/org/apache/tools/ant/taskdefs/MoveTest.java#L153-L174) | **Filtered Directory Move** | Integration of `FilterSet` application and directory flattening. | Configures a `Move` task with active `FilterSets` and `flatten=true`. Verifies that the task correctly processes content filtering (replacing tokens) while simultaneously restructuring the directory hierarchy (flattening) during the move operation. |
 
  **Test Implementation**
 
@@ -774,17 +774,17 @@ The new test cases were designed to target the "red areas" identified in the ini
 To improve the coverage of the `Copy` class, I focused on "unreachable" private methods and complex attribute validations that were missed by the original test suite. I implemented `CarolBoostTest.java` to target these specific areas.
 
 **Test File**
-* [`Copy.java`](https://github.com/J-ihsuan/Apache-Ant-Testing-Frameworks-and-Debugging-Practices/blob/c_branch/ApacheAnt/src/main/org/apache/tools/ant/taskdefs/Copy.java)
+* [`Copy.java`](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/master/src/main/org/apache/tools/ant/taskdefs/Copy.java)
 
  **Associated Component**
-  * [`getDueTo(Exception)`](https://github.com/J-ihsuan/Apache-Ant-Testing-Frameworks-and-Debugging-Practices/blob/391b27ebd48cc714c5017e1075cabf49e23ef7ca/ApacheAnt/src/main/org/apache/tools/ant/taskdefs/Copy.java#L1074-L1093): Private method for generating error messages (Tested via Reflection).
-  * [`validateAttributes()`](https://github.com/J-ihsuan/Apache-Ant-Testing-Frameworks-and-Debugging-Practices/blob/391b27ebd48cc714c5017e1075cabf49e23ef7ca/ApacheAnt/src/main/org/apache/tools/ant/taskdefs/Copy.java#L676-L726): Task attribute validation logic.
+  * [`getDueTo(Exception)`](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/afb6ab9de7ba2fac5537bec9ab1670d15b9a65de/src/main/org/apache/tools/ant/taskdefs/Copy.java#L1074-L1093): Private method for generating error messages (Tested via Reflection).
+  * [`validateAttributes()`](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/afb6ab9de7ba2fac5537bec9ab1670d15b9a65de/src/main/org/apache/tools/ant/taskdefs/Copy.java#L676-L726): Task attribute validation logic.
 
   **\<Copy> Test Case**
   | Test | Scenario | Functionality Tested | Behavioral Verification |
 | :--- | :--- | :--- | :--- |
-| [`testCopyCoverageBoost()`](https://github.com/J-ihsuan/Apache-Ant-Testing-Frameworks-and-Debugging-Practices/blob/391b27ebd48cc714c5017e1075cabf49e23ef7ca/ApacheAnt/src/tests/junit/org/apache/tools/ant/taskdefs/CarolBoostTest.java#L11-L45) | **Private Error Handling** (Reflection) | Internal exception message generation logic (`getDueTo`). | By utilizing **Java Reflection** to bypass access controls, this test directly invokes the private `getDueTo` method. It ensures that the task generates the precise, expected exception messages for obscure failure conditions that are unreachable via standard API calls. |
-| [`testCopyComplexResourceMapping()`](https://github.com/J-ihsuan/Apache-Ant-Testing-Frameworks-and-Debugging-Practices/blob/391b27ebd48cc714c5017e1075cabf49e23ef7ca/ApacheAnt/src/tests/junit/org/apache/tools/ant/taskdefs/CarolBoostTest.java#L47-L66) | **Edge Case Resource Validation** | Robustness of `validateAttributes` and `buildMap`. | Injects complex `FileResource` arrays and non-existent source files into the task. This verifies that the task's validation logic correctly identifies invalid inputs and handles resource loops gracefully without throwing unexpected runtime exceptions. |
+| [`testCopyCoverageBoost()`](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/afb6ab9de7ba2fac5537bec9ab1670d15b9a65de/src/tests/junit/org/apache/tools/ant/taskdefs/CarolBoostTest.java#L11-L45) | **Private Error Handling** (Reflection) | Internal exception message generation logic (`getDueTo`). | By utilizing **Java Reflection** to bypass access controls, this test directly invokes the private `getDueTo` method. It ensures that the task generates the precise, expected exception messages for obscure failure conditions that are unreachable via standard API calls. |
+| [`testCopyComplexResourceMapping()`](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/afb6ab9de7ba2fac5537bec9ab1670d15b9a65de/src/tests/junit/org/apache/tools/ant/taskdefs/CarolBoostTest.java#L47-L66) | **Edge Case Resource Validation** | Robustness of `validateAttributes` and `buildMap`. | Injects complex `FileResource` arrays and non-existent source files into the task. This verifies that the task's validation logic correctly identifies invalid inputs and handles resource loops gracefully without throwing unexpected runtime exceptions. |
 
  **Test Implementation**
 
@@ -851,16 +851,18 @@ The new test cases utilized Java Reflection and complex resource simulations to 
 To address the total absence of testing in the ExecuteOn class, I implemented CarolExecuteOnTest.java to establish a baseline functional test, focusing on core attribute configuration and the execution lifecycle.
 
 **Test File** 
-* [`CarolExecuteOnTest.java`](https://github.com/J-ihsuan/Apache-Ant-Testing-Frameworks-and-Debugging-Practices/blob/c_branch/ApacheAnt/src/main/org/apache/tools/ant/taskdefs/ExecuteOn.java#L55)
+* [`CarolExecuteOnTest.java`](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/master/src/main/org/apache/tools/ant/taskdefs/ExecuteOn.java)
 
  **Associated Component**
-  * [`ExecuteOn`](https://github.com/J-ihsuan/Apache-Ant-Testing-Frameworks-and-Debugging-Practices/blob/391b27ebd48cc714c5017e1075cabf49e23ef7ca/ApacheAnt/src/main/org/apache/tools/ant/taskdefs/ExecuteOn.java#L55-L89): The entire class logic, which previously had 0% coverage.
-  * [`createTargetfile()`](https://github.com/J-ihsuan/Apache-Ant-Testing-Frameworks-and-Debugging-Practices/blob/391b27ebd48cc714c5017e1075cabf49e23ef7ca/ApacheAnt/src/main/org/apache/tools/ant/taskdefs/ExecuteOn.java#L266-L274): Logic for constructing command line target files.
+  * [`ExecuteOn`](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/afb6ab9de7ba2fac5537bec9ab1670d15b9a65de/src/main/org/apache/tools/ant/taskdefs/ExecuteOn.java#L55-L89): The entire class logic, which previously had 0% coverage.
+  * [`createTargetfile()`](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/afb6ab9de7ba2fac5537bec9ab1670d15b9a65de/src/main/org/apache/tools/ant/taskdefs/ExecuteOn.java#L266-L274): Logic for constructing command line target files.
 
     **\<ExecuteOn> Test Case**
-    | Test | Scenario | Functionality Tested | Behavioral Verification |
+
+
+| Test | Scenario | Functionality Tested | Behavioral Verification |
 | :--- | :--- | :--- | :--- |
-| [`testExecuteOnCoverageBoost()`](https://github.com/J-ihsuan/Apache-Ant-Testing-Frameworks-and-Debugging-Practices/blob/391b27ebd48cc714c5017e1075cabf49e23ef7ca/ApacheAnt/src/tests/junit/org/apache/tools/ant/taskdefs/CarolExecuteOnTest.java#L8-L35) | **Task Configuration & Execution** (Smoke Test) | Setter validation, Command Line construction, and `execute()` lifecycle. | Acts as a functional baseline for the previously untested class. It configures the task with a comprehensive set of attributes (e.g., `verbose`, `parallel`, `skipEmpty`) and executes a system command (`echo`). This verifies that `ExecuteOn` correctly integrates with the underlying `ExecTask`, successfully constructing the command line and entering the execution loop. |
+| [`testExecuteOnCoverageBoost()`](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/afb6ab9de7ba2fac5537bec9ab1670d15b9a65de/src/tests/junit/org/apache/tools/ant/taskdefs/CarolExecuteOnTest.java#L8-L35) | **Task Configuration & Execution** (Smoke Test) | Setter validation, Command Line construction, and `execute()` lifecycle. | Acts as a functional baseline for the previously untested class. It configures the task with a comprehensive set of attributes (e.g., `verbose`, `parallel`, `skipEmpty`) and executes a system command (`echo`). This verifies that `ExecuteOn` correctly integrates with the underlying `ExecTask`, successfully constructing the command line and entering the execution loop. |
 
  **Test Implementation**
 
