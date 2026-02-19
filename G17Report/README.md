@@ -334,10 +334,10 @@
   ## 2.2 Feature 2 - MailMessage (Author: Eleanor)
   ### 2.2.1 Selection of a Non-trivial Functional Component
   #### Source code
-  * [org.apache.tools.mail.MailMessage](https://github.com/J-ihsuan/Apache-Ant-Testing-Frameworks-and-Debugging-Practices/blob/main/ApacheAnt/src/main/org/apache/tools/mail/MailMessage.java)
+  * [org.apache.tools.mail.MailMessage](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/098077beda8accd6a3453f6058214c6991ad8eae/src/main/org/apache/tools/mail/MailMessage.java)
 
   #### Description   
-  The [`MailMessage`](https://github.com/J-ihsuan/Apache-Ant-Testing-Frameworks-and-Debugging-Practices/blob/main/ApacheAnt/src/main/org/apache/tools/mail/MailMessage.java) class is a utility in Apache Ant used to send emails via the SMTP protocol. It manages an active network socket (`java.net.Socket`) and implements the client-side state of an SMTP transaction strictly.
+  The [`MailMessage`](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/098077beda8accd6a3453f6058214c6991ad8eae/src/main/org/apache/tools/mail/MailMessage.java) class is a utility in Apache Ant used to send emails via the SMTP protocol. It manages an active network socket (`java.net.Socket`) and implements the client-side state of an SMTP transaction strictly.
 
   #### Why it lends itself well to a FSM
   - **Strict Sequential Constraints:**   
@@ -345,11 +345,11 @@
   - **Distinct Stages:**   
       The object moves through clear stages: `CONNECTED` → `SENDER_SET` → `RECIPIENT_SET` → `DATA_MODE` → `SENT_CLOSE`
   - **Enforced Transition Logic:**   
-      The class contains an internal validation mechanism [`isResponseOK`](https://github.com/J-ihsuan/Apache-Ant-Testing-Frameworks-and-Debugging-Practices/blob/main/ApacheAnt/src/main/org/apache/tools/mail/MailMessage.java#L439-L447). If a method is called out of order, the underlying SMTP server returns an error code, and the `MailMessage` class catches this and throws an `IOException`. This prevents invalid state transitions effectively.
+      The class contains an internal validation mechanism [`isResponseOK`](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/098077beda8accd6a3453f6058214c6991ad8eae/src/main/org/apache/tools/mail/MailMessage.java#L439-L447). If a method is called out of order, the underlying SMTP server returns an error code, and the `MailMessage` class catches this and throws an `IOException`. This prevents invalid state transitions effectively.
   - **Error State Handling:**   
       If the socket connection fails, the object enters an invalid state where no further commands can be processed.
   - **Terminal States:** 
-      The object has a definitive lifecycle. Once [`sendAndClose()`](https://github.com/J-ihsuan/Apache-Ant-Testing-Frameworks-and-Debugging-Practices/blob/main/ApacheAnt/src/main/org/apache/tools/mail/MailMessage.java#L333-L340) is called, the socket is closed, and the object reaches a terminal state that cannot be reused.
+      The object has a definitive lifecycle. Once [`sendAndClose()`](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/098077beda8accd6a3453f6058214c6991ad8eae/src/main/org/apache/tools/mail/MailMessage.java#L333-L340) is called, the socket is closed, and the object reaches a terminal state that cannot be reused.
 
   ### 2.2.2 Functional Model Design
   **Model Description:**  
@@ -364,11 +364,11 @@
   **States Description**
   | State | Description |
   | ----- | ----------- |
-  |**CONNECTED**| Initial state after [`new MailMessage()`](https://github.com/J-ihsuan/Apache-Ant-Testing-Frameworks-and-Debugging-Practices/blob/main/ApacheAnt/src/main/org/apache/tools/mail/MailMessage.java#L149-L177) is constructed. <br> The socket is open, and the `HELO` command accepted by the server.|
-  |**SENDER_SET**| Sender address is set via [`from()`](https://github.com/J-ihsuan/Apache-Ant-Testing-Frameworks-and-Debugging-Practices/blob/main/ApacheAnt/src/main/org/apache/tools/mail/MailMessage.java#L194-L197) and `MAIL FROM` command accepted.|
-  |**RECIPIENT_SET**| Recipient address is set via [`to()`](https://github.com/J-ihsuan/Apache-Ant-Testing-Frameworks-and-Debugging-Practices/blob/main/ApacheAnt/src/main/org/apache/tools/mail/MailMessage.java#L217-L220) and `RCPT TO` command accepted. <br> Additional recipients or subject can be added here without changing the state.|
-  |**DATA_MODE**| [`getPrintStream()`](https://github.com/J-ihsuan/Apache-Ant-Testing-Frameworks-and-Debugging-Practices/blob/main/ApacheAnt/src/main/org/apache/tools/mail/MailMessage.java#L276-L286) method is called, indicating the start of writing the email body. `DATA` command accepted.|
-  |**SENT_CLOSE**|Terminal state after [`sendAndClose()`](https://github.com/J-ihsuan/Apache-Ant-Testing-Frameworks-and-Debugging-Practices/blob/main/ApacheAnt/src/main/org/apache/tools/mail/MailMessage.java#L333-L340) is executed. `QUIT` command accepted, and the socket is disconnected.|
+  |**CONNECTED**| Initial state after [`new MailMessage()`](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/098077beda8accd6a3453f6058214c6991ad8eae/src/main/org/apache/tools/mail/MailMessage.java#L149-L177) is constructed. <br> The socket is open, and the `HELO` command accepted by the server.|
+  |**SENDER_SET**| Sender address is set via [`from()`](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/098077beda8accd6a3453f6058214c6991ad8eae/src/main/org/apache/tools/mail/MailMessage.java#L194-L197) and `MAIL FROM` command accepted.|
+  |**RECIPIENT_SET**| Recipient address is set via [`to()`](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/098077beda8accd6a3453f6058214c6991ad8eae/src/main/org/apache/tools/mail/MailMessage.java#L217-L220) and `RCPT TO` command accepted. <br> Additional recipients or subject can be added here without changing the state.|
+  |**DATA_MODE**| [`getPrintStream()`](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/098077beda8accd6a3453f6058214c6991ad8eae/src/main/org/apache/tools/mail/MailMessage.java#L276-L286) method is called, indicating the start of writing the email body. `DATA` command accepted.|
+  |**SENT_CLOSE**|Terminal state after [`sendAndClose()`](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/098077beda8accd6a3453f6058214c6991ad8eae/src/main/org/apache/tools/mail/MailMessage.java#L333-L340) is executed. `QUIT` command accepted, and the socket is disconnected.|
   |**ERROR**|Terminal state reached when an IOException occurs due to: <br> **Protocol Violation:** Calling methods out of order (e.g., to() before from()), causing a server error. <br> **Connection Failure:** Network interruption.|
 
   **Transitions & Rules**
@@ -386,7 +386,7 @@
   To validate the Finite State Machine model of the `MailMessage` class, I implemented the JUnit test suite `MailMessageFSMTest.java`. And since the `MailMessage` class relies on actual network socket connections, I employed mock servers to verify different state transitions.
 
   **Test File** 
-  * [MailMessageFSMTest.java](https://github.com/J-ihsuan/Apache-Ant-Testing-Frameworks-and-Debugging-Practices/blob/e_branch/ApacheAnt/src/tests/junit/org/apache/tools/mail/MailMessageFSMTest.java)
+  * [MailMessageFSMTest.java](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/098077beda8accd6a3453f6058214c6991ad8eae/src/tests/junit/org/apache/tools/mail/MailMessageFSMTest.java)
 
   **Test Case Preview**
   ```
@@ -405,7 +405,7 @@
 
   **Test Strategy**
   1.  **Happy Path Verification:**
-      Use the Ant project's built-in [`DummyMailServer`](https://github.com/J-ihsuan/Apache-Ant-Testing-Frameworks-and-Debugging-Practices/blob/main/ApacheAnt/src/tests/junit/org/apache/tools/ant/DummyMailServer.java) to simulate a standard SMTP server. This verifies that the client correctly executes the full sequence of state transitions under normal conditions.
+      Use the Ant project's built-in [`DummyMailServer`](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/098077beda8accd6a3453f6058214c6991ad8eae/src/tests/junit/org/apache/tools/ant/DummyMailServer.java) to simulate a standard SMTP server. This verifies that the client correctly executes the full sequence of state transitions under normal conditions.
 
   2.  **Error Path Verification:**
       Implement custom mock servers (`OOOMailServer` and `GhostMailServer`) to simulate protocol violations and network interruptions. These verify that the FSM correctly transitions to the **ERROR** state and throws an `IOException`.
@@ -414,15 +414,15 @@
 
   | Test Method | Scenario | Covered FSM Path | Description |
   | :--- | :--- | :--- | :--- |
-  | [`testFSMHappyPath`](https://github.com/J-ihsuan/Apache-Ant-Testing-Frameworks-and-Debugging-Practices/blob/e_branch/ApacheAnt/src/tests/junit/org/apache/tools/mail/MailMessageFSMTest.java#L41-L87) | **Standard Transaction**<br>Verifies the complete valid sequence of SMTP commands. | `[*] -> CONNECTED -> SENDER_SET -> RECIPIENT_SET -> DATA_MODE -> SENT_CLOSE` | The client completes the transaction without error. The log verifies the correct receipt of `HELO`, `MAIL FROM`, `RCPT TO`, `DATA`, `QUIT` and success codes 220, 250, 354 and 221. |
-  | [`testFSMProtocolViolation`](https://github.com/J-ihsuan/Apache-Ant-Testing-Frameworks-and-Debugging-Practices/blob/e_branch/ApacheAnt/src/tests/junit/org/apache/tools/mail/MailMessageFSMTest.java#L95-L112) | **Protocol Violation**<br>Simulates an attempt to set a recipient before a sender is established. | `CONNECTED` --(`to()` skip `from()`)--> `RECIPIENT_SET` (Invalid) -> `ERROR` | The `OOOMailServer` returns a `500 Error` when the out-of-order command is received. The `MailMessage` class detects the error code and throws an `IOException`. |
-  | [`testFSMNetworkInterruption`](https://github.com/J-ihsuan/Apache-Ant-Testing-Frameworks-and-Debugging-Practices/blob/e_branch/ApacheAnt/src/tests/junit/org/apache/tools/mail/MailMessageFSMTest.java#L120-L143) | **Network Interruption**<br>Simulates a server crash or connection loss during the transaction. | `CONNECTED` -> `SENDER_SET` -> `RECIPIENT_SET` -> `ERROR` | The `GhostMailServer` accepts the connection but closes the socket after the `RCPT TO` stage. The client throws an `IOException` when attempting to write data to the closed connection. |
+  | [`testFSMHappyPath`](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/098077beda8accd6a3453f6058214c6991ad8eae/src/tests/junit/org/apache/tools/mail/MailMessageFSMTest.java#L41-L87) | **Standard Transaction**<br>Verifies the complete valid sequence of SMTP commands. | `[*] -> CONNECTED -> SENDER_SET -> RECIPIENT_SET -> DATA_MODE -> SENT_CLOSE` | The client completes the transaction without error. The log verifies the correct receipt of `HELO`, `MAIL FROM`, `RCPT TO`, `DATA`, `QUIT` and success codes 220, 250, 354 and 221. |
+  | [`testFSMProtocolViolation`](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/098077beda8accd6a3453f6058214c6991ad8eae/src/tests/junit/org/apache/tools/mail/MailMessageFSMTest.java#L95-L112) | **Protocol Violation**<br>Simulates an attempt to set a recipient before a sender is established. | `CONNECTED` --(`to()` skip `from()`)--> `RECIPIENT_SET` (Invalid) -> `ERROR` | The `OOOMailServer` returns a `500 Error` when the out-of-order command is received. The `MailMessage` class detects the error code and throws an `IOException`. |
+  | [`testFSMNetworkInterruption`](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/098077beda8accd6a3453f6058214c6991ad8eae/src/tests/junit/org/apache/tools/mail/MailMessageFSMTest.java#L120-L143) | **Network Interruption**<br>Simulates a server crash or connection loss during the transaction. | `CONNECTED` -> `SENDER_SET` -> `RECIPIENT_SET` -> `ERROR` | The `GhostMailServer` accepts the connection but closes the socket after the `RCPT TO` stage. The client throws an `IOException` when attempting to write data to the closed connection. |
 
   **Mock Servers**
-  * **[`OOOMailServer`](https://github.com/J-ihsuan/Apache-Ant-Testing-Frameworks-and-Debugging-Practices/blob/e_branch/ApacheAnt/src/tests/junit/org/apache/tools/mail/MailMessageFSMTest.java#L146-L198)** (Out-of-Order):  
+  * **[`OOOMailServer`](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/098077beda8accd6a3453f6058214c6991ad8eae/src/tests/junit/org/apache/tools/mail/MailMessageFSMTest.java#L146-L198)** (Out-of-Order):  
       A mock SMTP server designed to simulate protocol errors. It will return a `500 Error` response when it receives `RCPT TO`.
 
-  * **[`GhostMailServer`](https://github.com/J-ihsuan/Apache-Ant-Testing-Frameworks-and-Debugging-Practices/blob/e_branch/ApacheAnt/src/tests/junit/org/apache/tools/mail/MailMessageFSMTest.java#L201-L255):**
+  * **[`GhostMailServer`](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/098077beda8accd6a3453f6058214c6991ad8eae/src/tests/junit/org/apache/tools/mail/MailMessageFSMTest.java#L201-L255):**
       A mock SMTP server designed to simulate network failures. It closes the socket connection after receiving `RCPT TO`.
 
   **Test Implementation**
@@ -505,7 +505,7 @@
   </details>
 
   ### 2.3 \<Delete\> Class Coverage Summary
-  The [**Delete**](https://github.com/J-ihsuan/Apache-Ant-Testing-Frameworks-and-Debugging-Practices/blob/main/ApacheAnt/src/main/org/apache/tools/ant/taskdefs/Delete.java) class is currently a weak point in the test suite, falling below the project average.  
+  The [**Delete**](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/098077beda8accd6a3453f6058214c6991ad8eae/src/main/org/apache/tools/ant/taskdefs/Delete.java) class is currently a weak point in the test suite, falling below the project average.  
   The method coverage is the most critical metric, indicating that more than half of the methods in this class are never invoked by any test.
 
   |                  | Total | Missed | Covered | Coverage % | 
@@ -529,7 +529,7 @@
   ----
 
   ### 2.4 \<Mail\> Function Coverage Summary
-  The [**Mail**](https://github.com/J-ihsuan/Apache-Ant-Testing-Frameworks-and-Debugging-Practices/tree/main/ApacheAnt/src/main/org/apache/tools/mail) function demonstrates strong test reliability, significantly outperforming the project average. The 85% instruction and 88% method coverage are excellent, showing that the primary functionality is well-tested.
+  The [**Mail**](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/tree/098077beda8accd6a3453f6058214c6991ad8eae/src/main/org/apache/tools/mail) function demonstrates strong test reliability, significantly outperforming the project average. The 85% instruction and 88% method coverage are excellent, showing that the primary functionality is well-tested.
   |                  | Total | Missed | Covered | Coverage % | 
   |:----------------:|:-----:|:------:|:-------:|:----------:|
   | **Instructions** | 697  | 99 | 598 | 85%     | 
@@ -539,8 +539,8 @@
   | **Classes**      | 4    | 1  | 3   | 75%     |
 
   **Uncovered Part**  
-  1. The [**ErrorInQuitException**](https://github.com/J-ihsuan/Apache-Ant-Testing-Frameworks-and-Debugging-Practices/blob/main/ApacheAnt/src/main/org/apache/tools/mail/ErrorInQuitException.java) class is missed. The tests never trigger the error condition that occurs during the SMTP `QUIT` command.
-  2. In the [**MailMessage**](https://github.com/J-ihsuan/Apache-Ant-Testing-Frameworks-and-Debugging-Practices/blob/main/ApacheAnt/src/main/org/apache/tools/mail/MailMessage.java) class, the alternative Constructors `MailMessage()`, `MailMessage(String)` and `setPort(int)` are never used. The tests use the `MailMessage(String, int)` constructor.
+  1. The [**ErrorInQuitException**](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/098077beda8accd6a3453f6058214c6991ad8eae/src/main/org/apache/tools/mail/ErrorInQuitException.java) class is missed. The tests never trigger the error condition that occurs during the SMTP `QUIT` command.
+  2. In the [**MailMessage**](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/098077beda8accd6a3453f6058214c6991ad8eae/src/main/org/apache/tools/mail/MailMessage.java) class, the alternative Constructors `MailMessage()`, `MailMessage(String)` and `setPort(int)` are never used. The tests use the `MailMessage(String, int)` constructor.
   <details>
     <summary>Click to View Detail Report of Mail</summary>
     <div align="center">
@@ -633,27 +633,27 @@ The `ExecuteOn` class represents a significant gap in the current test suite. It
 ----
 
 ### 3.1 \<Delete> Coverage Test  (Author: Eleanor)
-White-box testing of Delete class focusing on internal method execution, implicit logical operators, and complex integration with the [`selectors`](https://github.com/J-ihsuan/Apache-Ant-Testing-Frameworks-and-Debugging-Practices/tree/e_branch/ApacheAnt/src/main/org/apache/tools/ant/types/selectors) package.
+White-box testing of Delete class focusing on internal method execution, implicit logical operators, and complex integration with the [`selectors`](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/tree/098077beda8accd6a3453f6058214c6991ad8eae/src/main/org/apache/tools/ant/types/selectors) package.
 
 **Test File** 
-  * [`DeleteWhiteBoxTest.java`](https://github.com/J-ihsuan/Apache-Ant-Testing-Frameworks-and-Debugging-Practices/blob/e_branch/ApacheAnt/src/tests/junit/org/apache/tools/ant/taskdefs/DeleteWhiteBoxTest.java)
+  * [`DeleteWhiteBoxTest.java`](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/098077beda8accd6a3453f6058214c6991ad8eae/src/tests/junit/org/apache/tools/ant/taskdefs/DeleteWhiteBoxTest.java)
 
 
 **Associated Component**
-* [`removeFiles(File d, String[] f, String[] d)`](https://github.com/J-ihsuan/Apache-Ant-Testing-Frameworks-and-Debugging-Practices/blob/e_branch/ApacheAnt/src/main/org/apache/tools/ant/taskdefs/Delete.java#L839-L876): Low-level file and directory array processing.
-* [`setCaseSensitive(boolean)`](https://github.com/J-ihsuan/Apache-Ant-Testing-Frameworks-and-Debugging-Practices/blob/e_branch/ApacheAnt/src/main/org/apache/tools/ant/taskdefs/Delete.java#L363-L366): Configuration for path-matching case sensitivity.
-* [`createInclude()`](https://github.com/J-ihsuan/Apache-Ant-Testing-Frameworks-and-Debugging-Practices/blob/e_branch/ApacheAnt/src/main/org/apache/tools/ant/taskdefs/Delete.java#L250-L253), [`createExclude()`](https://github.com/J-ihsuan/Apache-Ant-Testing-Frameworks-and-Debugging-Practices/blob/e_branch/ApacheAnt/src/main/org/apache/tools/ant/taskdefs/Delete.java#L270-L273): Internal `PatternSet` builder methods.
+* [`removeFiles(File d, String[] f, String[] d)`](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/098077beda8accd6a3453f6058214c6991ad8eae/src/main/org/apache/tools/ant/taskdefs/Delete.java#L839-L876): Low-level file and directory array processing.
+* [`setCaseSensitive(boolean)`](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/098077beda8accd6a3453f6058214c6991ad8eae/src/main/org/apache/tools/ant/taskdefs/Delete.java#L363-L366): Configuration for path-matching case sensitivity.
+* [`createInclude()`](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/098077beda8accd6a3453f6058214c6991ad8eae/src/main/org/apache/tools/ant/taskdefs/Delete.java#L250-L253), [`createExclude()`](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/098077beda8accd6a3453f6058214c6991ad8eae/src/main/org/apache/tools/ant/taskdefs/Delete.java#L270-L273): Internal `PatternSet` builder methods.
 * Selector Registration Methods: `addFilename()`, `addContains()`, `addNot()`, `addPresent()`, `addDepth()`, `addSize()`, `addOr()`, and `addAnd()`.
 
 **Test Case**
 | Test | Scenario | Functionality Tested | Behavioral Verification |
 | :--- | :--- | :--- | :--- |
-| [`testRemoveFilesDirectly()`](https://github.com/J-ihsuan/Apache-Ant-Testing-Frameworks-and-Debugging-Practices/blob/e_branch/ApacheAnt/src/tests/junit/org/apache/tools/ant/taskdefs/DeleteWhiteBoxTest.java#L52-L84) | Direct Invocation of `removeFiles()` | Internal mechanism for files & directories deletion. | By bypassing the `DirectoryScanner` and injecting hardcoded string arrays (simulating scanner output), this test ensures that the `Delete` task correctly processes isolated arrays of file and directory paths, removing only what is specified and preserving adjacent files. |
-| [`testDeleteByContentAndFilename()`](https://github.com/J-ihsuan/Apache-Ant-Testing-Frameworks-and-Debugging-Practices/blob/e_branch/ApacheAnt/src/tests/junit/org/apache/tools/ant/taskdefs/DeleteWhiteBoxTest.java#L95-L131) | Content & Filename Deletion (Multi Selectors) | Implicit logical intersection AND when multiple selectors are added directly. | Ensures a file is deleted only if it meets **all** conditions simultaneously (e.g., content contains "ERROR" AND name matches `*.txt`). |
-| [`testDeleteUsingNestedPatterns()`](https://github.com/J-ihsuan/Apache-Ant-Testing-Frameworks-and-Debugging-Practices/blob/e_branch/ApacheAnt/src/tests/junit/org/apache/tools/ant/taskdefs/DeleteWhiteBoxTest.java#L140-L159) | Pattern Builder Integration (`PatternSet`) | Internal handling of standard include/exclude patterns. | Validates that `PatternSet.NameEntry` objects correctly target standard files (e.g., `*.class`) for deletion while strictly protecting excluded patterns (e.g., `*Test*`). |
-| [`testCaseInsensitiveAndNotSelector()`](https://github.com/J-ihsuan/Apache-Ant-Testing-Frameworks-and-Debugging-Practices/blob/e_branch/ApacheAnt/src/tests/junit/org/apache/tools/ant/taskdefs/DeleteWhiteBoxTest.java#L168-L196)| Case-Insensitive Deletion with NOT | Interaction between case-blind configuration and `NotSelector`. | Proves `caseSensitive=false` targets files regardless of casing (e.g., `.TXT` vs `.txt`), while a `NotSelector` successfully overrides this to protect specific files. |
-| [`testCrossDirectoryPresenceCleanup()`](https://github.com/J-ihsuan/Apache-Ant-Testing-Frameworks-and-Debugging-Practices/blob/e_branch/ApacheAnt/src/tests/junit/org/apache/tools/ant/taskdefs/DeleteWhiteBoxTest.java#L205-L237) | Cross-Directory Cleanup | Advanced filesystem state checks across different directory structures. | Uses `PresentSelector` and `IdentityMapper` to check a secondary `src` directory; ensures files in `build` directory are only deleted if their equivalent counterpart still exists in `src`. |
-| [`testDeepSmallLogOrTmpCleanup()`](https://github.com/J-ihsuan/Apache-Ant-Testing-Frameworks-and-Debugging-Practices/blob/e_branch/ApacheAnt/src/tests/junit/org/apache/tools/ant/taskdefs/DeleteWhiteBoxTest.java#L249-L310) | Multi-Dimensional Constraint Filtering | Aggregated selector logic combining structural, physical, and metadata conditions. |  Validates a complex, real-world maintenance scenario. It ensures a file is only deleted if it is buried in a subdirectory (Depth >= 1), falls beneath a specific file size threshold (Size < 50 bytes), and matches at least one of two file extensions (using logical OR). |
+| [`testRemoveFilesDirectly()`](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/098077beda8accd6a3453f6058214c6991ad8eae/src/tests/junit/org/apache/tools/ant/taskdefs/DeleteWhiteBoxTest.java#L52-L84) | Direct Invocation of `removeFiles()` | Internal mechanism for files & directories deletion. | By bypassing the `DirectoryScanner` and injecting hardcoded string arrays (simulating scanner output), this test ensures that the `Delete` task correctly processes isolated arrays of file and directory paths, removing only what is specified and preserving adjacent files. |
+| [`testDeleteByContentAndFilename()`](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/098077beda8accd6a3453f6058214c6991ad8eae/src/tests/junit/org/apache/tools/ant/taskdefs/DeleteWhiteBoxTest.java#L95-L131) | Content & Filename Deletion (Multi Selectors) | Implicit logical intersection AND when multiple selectors are added directly. | Ensures a file is deleted only if it meets **all** conditions simultaneously (e.g., content contains "ERROR" AND name matches `*.txt`). |
+| [`testDeleteUsingNestedPatterns()`](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/098077beda8accd6a3453f6058214c6991ad8eae/src/tests/junit/org/apache/tools/ant/taskdefs/DeleteWhiteBoxTest.java#L140-L159) | Pattern Builder Integration (`PatternSet`) | Internal handling of standard include/exclude patterns. | Validates that `PatternSet.NameEntry` objects correctly target standard files (e.g., `*.class`) for deletion while strictly protecting excluded patterns (e.g., `*Test*`). |
+| [`testCaseInsensitiveAndNotSelector()`](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/098077beda8accd6a3453f6058214c6991ad8eae/src/tests/junit/org/apache/tools/ant/taskdefs/DeleteWhiteBoxTest.java#L168-L196)| Case-Insensitive Deletion with NOT | Interaction between case-blind configuration and `NotSelector`. | Proves `caseSensitive=false` targets files regardless of casing (e.g., `.TXT` vs `.txt`), while a `NotSelector` successfully overrides this to protect specific files. |
+| [`testCrossDirectoryPresenceCleanup()`](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/098077beda8accd6a3453f6058214c6991ad8eae/src/tests/junit/org/apache/tools/ant/taskdefs/DeleteWhiteBoxTest.java#L205-L237) | Cross-Directory Cleanup | Advanced filesystem state checks across different directory structures. | Uses `PresentSelector` and `IdentityMapper` to check a secondary `src` directory; ensures files in `build` directory are only deleted if their equivalent counterpart still exists in `src`. |
+| [`testDeepSmallLogOrTmpCleanup()`](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/098077beda8accd6a3453f6058214c6991ad8eae/src/tests/junit/org/apache/tools/ant/taskdefs/DeleteWhiteBoxTest.java#L249-L310) | Multi-Dimensional Constraint Filtering | Aggregated selector logic combining structural, physical, and metadata conditions. |  Validates a complex, real-world maintenance scenario. It ensures a file is only deleted if it is buried in a subdirectory (Depth >= 1), falls beneath a specific file size threshold (Size < 50 bytes), and matches at least one of two file extensions (using logical OR). |
 
  **Test Implementation**
 
