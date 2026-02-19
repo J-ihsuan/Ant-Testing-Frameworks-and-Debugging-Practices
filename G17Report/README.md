@@ -334,10 +334,10 @@
   ## 2.2 Feature 2 - MailMessage (Author: Eleanor)
   ### 2.2.1 Selection of a Non-trivial Functional Component
   #### Source code
-  * [org.apache.tools.mail.MailMessage](https://github.com/J-ihsuan/Apache-Ant-Testing-Frameworks-and-Debugging-Practices/blob/main/ApacheAnt/src/main/org/apache/tools/mail/MailMessage.java)
+  * [org.apache.tools.mail.MailMessage](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/098077beda8accd6a3453f6058214c6991ad8eae/src/main/org/apache/tools/mail/MailMessage.java)
 
   #### Description   
-  The [`MailMessage`](https://github.com/J-ihsuan/Apache-Ant-Testing-Frameworks-and-Debugging-Practices/blob/main/ApacheAnt/src/main/org/apache/tools/mail/MailMessage.java) class is a utility in Apache Ant used to send emails via the SMTP protocol. It manages an active network socket (`java.net.Socket`) and implements the client-side state of an SMTP transaction strictly.
+  The [`MailMessage`](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/098077beda8accd6a3453f6058214c6991ad8eae/src/main/org/apache/tools/mail/MailMessage.java) class is a utility in Apache Ant used to send emails via the SMTP protocol. It manages an active network socket (`java.net.Socket`) and implements the client-side state of an SMTP transaction strictly.
 
   #### Why it lends itself well to a FSM
   - **Strict Sequential Constraints:**   
@@ -345,11 +345,11 @@
   - **Distinct Stages:**   
       The object moves through clear stages: `CONNECTED` → `SENDER_SET` → `RECIPIENT_SET` → `DATA_MODE` → `SENT_CLOSE`
   - **Enforced Transition Logic:**   
-      The class contains an internal validation mechanism [`isResponseOK`](https://github.com/J-ihsuan/Apache-Ant-Testing-Frameworks-and-Debugging-Practices/blob/main/ApacheAnt/src/main/org/apache/tools/mail/MailMessage.java#L439-L447). If a method is called out of order, the underlying SMTP server returns an error code, and the `MailMessage` class catches this and throws an `IOException`. This prevents invalid state transitions effectively.
+      The class contains an internal validation mechanism [`isResponseOK`](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/098077beda8accd6a3453f6058214c6991ad8eae/src/main/org/apache/tools/mail/MailMessage.java#L439-L447). If a method is called out of order, the underlying SMTP server returns an error code, and the `MailMessage` class catches this and throws an `IOException`. This prevents invalid state transitions effectively.
   - **Error State Handling:**   
       If the socket connection fails, the object enters an invalid state where no further commands can be processed.
   - **Terminal States:** 
-      The object has a definitive lifecycle. Once [`sendAndClose()`](https://github.com/J-ihsuan/Apache-Ant-Testing-Frameworks-and-Debugging-Practices/blob/main/ApacheAnt/src/main/org/apache/tools/mail/MailMessage.java#L333-L340) is called, the socket is closed, and the object reaches a terminal state that cannot be reused.
+      The object has a definitive lifecycle. Once [`sendAndClose()`](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/098077beda8accd6a3453f6058214c6991ad8eae/src/main/org/apache/tools/mail/MailMessage.java#L333-L340) is called, the socket is closed, and the object reaches a terminal state that cannot be reused.
 
   ### 2.2.2 Functional Model Design
   **Model Description:**  
@@ -364,11 +364,11 @@
   **States Description**
   | State | Description |
   | ----- | ----------- |
-  |**CONNECTED**| Initial state after [`new MailMessage()`](https://github.com/J-ihsuan/Apache-Ant-Testing-Frameworks-and-Debugging-Practices/blob/main/ApacheAnt/src/main/org/apache/tools/mail/MailMessage.java#L149-L177) is constructed. <br> The socket is open, and the `HELO` command accepted by the server.|
-  |**SENDER_SET**| Sender address is set via [`from()`](https://github.com/J-ihsuan/Apache-Ant-Testing-Frameworks-and-Debugging-Practices/blob/main/ApacheAnt/src/main/org/apache/tools/mail/MailMessage.java#L194-L197) and `MAIL FROM` command accepted.|
-  |**RECIPIENT_SET**| Recipient address is set via [`to()`](https://github.com/J-ihsuan/Apache-Ant-Testing-Frameworks-and-Debugging-Practices/blob/main/ApacheAnt/src/main/org/apache/tools/mail/MailMessage.java#L217-L220) and `RCPT TO` command accepted. <br> Additional recipients or subject can be added here without changing the state.|
-  |**DATA_MODE**| [`getPrintStream()`](https://github.com/J-ihsuan/Apache-Ant-Testing-Frameworks-and-Debugging-Practices/blob/main/ApacheAnt/src/main/org/apache/tools/mail/MailMessage.java#L276-L286) method is called, indicating the start of writing the email body. `DATA` command accepted.|
-  |**SENT_CLOSE**|Terminal state after [`sendAndClose()`](https://github.com/J-ihsuan/Apache-Ant-Testing-Frameworks-and-Debugging-Practices/blob/main/ApacheAnt/src/main/org/apache/tools/mail/MailMessage.java#L333-L340) is executed. `QUIT` command accepted, and the socket is disconnected.|
+  |**CONNECTED**| Initial state after [`new MailMessage()`](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/098077beda8accd6a3453f6058214c6991ad8eae/src/main/org/apache/tools/mail/MailMessage.java#L149-L177) is constructed. <br> The socket is open, and the `HELO` command accepted by the server.|
+  |**SENDER_SET**| Sender address is set via [`from()`](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/098077beda8accd6a3453f6058214c6991ad8eae/src/main/org/apache/tools/mail/MailMessage.java#L194-L197) and `MAIL FROM` command accepted.|
+  |**RECIPIENT_SET**| Recipient address is set via [`to()`](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/098077beda8accd6a3453f6058214c6991ad8eae/src/main/org/apache/tools/mail/MailMessage.java#L217-L220) and `RCPT TO` command accepted. <br> Additional recipients or subject can be added here without changing the state.|
+  |**DATA_MODE**| [`getPrintStream()`](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/098077beda8accd6a3453f6058214c6991ad8eae/src/main/org/apache/tools/mail/MailMessage.java#L276-L286) method is called, indicating the start of writing the email body. `DATA` command accepted.|
+  |**SENT_CLOSE**|Terminal state after [`sendAndClose()`](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/098077beda8accd6a3453f6058214c6991ad8eae/src/main/org/apache/tools/mail/MailMessage.java#L333-L340) is executed. `QUIT` command accepted, and the socket is disconnected.|
   |**ERROR**|Terminal state reached when an IOException occurs due to: <br> **Protocol Violation:** Calling methods out of order (e.g., to() before from()), causing a server error. <br> **Connection Failure:** Network interruption.|
 
   **Transitions & Rules**
@@ -386,7 +386,7 @@
   To validate the Finite State Machine model of the `MailMessage` class, I implemented the JUnit test suite `MailMessageFSMTest.java`. And since the `MailMessage` class relies on actual network socket connections, I employed mock servers to verify different state transitions.
 
   **Test File** 
-  * [MailMessageFSMTest.java](https://github.com/J-ihsuan/Apache-Ant-Testing-Frameworks-and-Debugging-Practices/blob/e_branch/ApacheAnt/src/tests/junit/org/apache/tools/mail/MailMessageFSMTest.java)
+  * [MailMessageFSMTest.java](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/098077beda8accd6a3453f6058214c6991ad8eae/src/tests/junit/org/apache/tools/mail/MailMessageFSMTest.java)
 
   **Test Case Preview**
   ```
@@ -405,7 +405,7 @@
 
   **Test Strategy**
   1.  **Happy Path Verification:**
-      Use the Ant project's built-in [`DummyMailServer`](https://github.com/J-ihsuan/Apache-Ant-Testing-Frameworks-and-Debugging-Practices/blob/main/ApacheAnt/src/tests/junit/org/apache/tools/ant/DummyMailServer.java) to simulate a standard SMTP server. This verifies that the client correctly executes the full sequence of state transitions under normal conditions.
+      Use the Ant project's built-in [`DummyMailServer`](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/098077beda8accd6a3453f6058214c6991ad8eae/src/tests/junit/org/apache/tools/ant/DummyMailServer.java) to simulate a standard SMTP server. This verifies that the client correctly executes the full sequence of state transitions under normal conditions.
 
   2.  **Error Path Verification:**
       Implement custom mock servers (`OOOMailServer` and `GhostMailServer`) to simulate protocol violations and network interruptions. These verify that the FSM correctly transitions to the **ERROR** state and throws an `IOException`.
@@ -414,15 +414,15 @@
 
   | Test Method | Scenario | Covered FSM Path | Description |
   | :--- | :--- | :--- | :--- |
-  | [`testFSMHappyPath`](https://github.com/J-ihsuan/Apache-Ant-Testing-Frameworks-and-Debugging-Practices/blob/e_branch/ApacheAnt/src/tests/junit/org/apache/tools/mail/MailMessageFSMTest.java#L41-L87) | **Standard Transaction**<br>Verifies the complete valid sequence of SMTP commands. | `[*] -> CONNECTED -> SENDER_SET -> RECIPIENT_SET -> DATA_MODE -> SENT_CLOSE` | The client completes the transaction without error. The log verifies the correct receipt of `HELO`, `MAIL FROM`, `RCPT TO`, `DATA`, `QUIT` and success codes 220, 250, 354 and 221. |
-  | [`testFSMProtocolViolation`](https://github.com/J-ihsuan/Apache-Ant-Testing-Frameworks-and-Debugging-Practices/blob/e_branch/ApacheAnt/src/tests/junit/org/apache/tools/mail/MailMessageFSMTest.java#L95-L112) | **Protocol Violation**<br>Simulates an attempt to set a recipient before a sender is established. | `CONNECTED` --(`to()` skip `from()`)--> `RECIPIENT_SET` (Invalid) -> `ERROR` | The `OOOMailServer` returns a `500 Error` when the out-of-order command is received. The `MailMessage` class detects the error code and throws an `IOException`. |
-  | [`testFSMNetworkInterruption`](https://github.com/J-ihsuan/Apache-Ant-Testing-Frameworks-and-Debugging-Practices/blob/e_branch/ApacheAnt/src/tests/junit/org/apache/tools/mail/MailMessageFSMTest.java#L120-L143) | **Network Interruption**<br>Simulates a server crash or connection loss during the transaction. | `CONNECTED` -> `SENDER_SET` -> `RECIPIENT_SET` -> `ERROR` | The `GhostMailServer` accepts the connection but closes the socket after the `RCPT TO` stage. The client throws an `IOException` when attempting to write data to the closed connection. |
+  | [`testFSMHappyPath`](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/098077beda8accd6a3453f6058214c6991ad8eae/src/tests/junit/org/apache/tools/mail/MailMessageFSMTest.java#L41-L87) | **Standard Transaction**<br>Verifies the complete valid sequence of SMTP commands. | `[*] -> CONNECTED -> SENDER_SET -> RECIPIENT_SET -> DATA_MODE -> SENT_CLOSE` | The client completes the transaction without error. The log verifies the correct receipt of `HELO`, `MAIL FROM`, `RCPT TO`, `DATA`, `QUIT` and success codes 220, 250, 354 and 221. |
+  | [`testFSMProtocolViolation`](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/098077beda8accd6a3453f6058214c6991ad8eae/src/tests/junit/org/apache/tools/mail/MailMessageFSMTest.java#L95-L112) | **Protocol Violation**<br>Simulates an attempt to set a recipient before a sender is established. | `CONNECTED` --(`to()` skip `from()`)--> `RECIPIENT_SET` (Invalid) -> `ERROR` | The `OOOMailServer` returns a `500 Error` when the out-of-order command is received. The `MailMessage` class detects the error code and throws an `IOException`. |
+  | [`testFSMNetworkInterruption`](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/098077beda8accd6a3453f6058214c6991ad8eae/src/tests/junit/org/apache/tools/mail/MailMessageFSMTest.java#L120-L143) | **Network Interruption**<br>Simulates a server crash or connection loss during the transaction. | `CONNECTED` -> `SENDER_SET` -> `RECIPIENT_SET` -> `ERROR` | The `GhostMailServer` accepts the connection but closes the socket after the `RCPT TO` stage. The client throws an `IOException` when attempting to write data to the closed connection. |
 
   **Mock Servers**
-  * **[`OOOMailServer`](https://github.com/J-ihsuan/Apache-Ant-Testing-Frameworks-and-Debugging-Practices/blob/e_branch/ApacheAnt/src/tests/junit/org/apache/tools/mail/MailMessageFSMTest.java#L146-L198)** (Out-of-Order):  
+  * **[`OOOMailServer`](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/098077beda8accd6a3453f6058214c6991ad8eae/src/tests/junit/org/apache/tools/mail/MailMessageFSMTest.java#L146-L198)** (Out-of-Order):  
       A mock SMTP server designed to simulate protocol errors. It will return a `500 Error` response when it receives `RCPT TO`.
 
-  * **[`GhostMailServer`](https://github.com/J-ihsuan/Apache-Ant-Testing-Frameworks-and-Debugging-Practices/blob/e_branch/ApacheAnt/src/tests/junit/org/apache/tools/mail/MailMessageFSMTest.java#L201-L255):**
+  * **[`GhostMailServer`](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/098077beda8accd6a3453f6058214c6991ad8eae/src/tests/junit/org/apache/tools/mail/MailMessageFSMTest.java#L201-L255):**
       A mock SMTP server designed to simulate network failures. It closes the socket connection after receiving `RCPT TO`.
 
   **Test Implementation**
@@ -540,7 +540,7 @@
 
   **Uncovered Part**  
   1. The [**ErrorInQuitException**](https://github.com/J-ihsuan/Apache-Ant-Testing-Frameworks-and-Debugging-Practices/blob/main/ApacheAnt/src/main/org/apache/tools/mail/ErrorInQuitException.java) class is missed. The tests never trigger the error condition that occurs during the SMTP `QUIT` command.
-  2. In the [**MailMessage**](https://github.com/J-ihsuan/Apache-Ant-Testing-Frameworks-and-Debugging-Practices/blob/main/ApacheAnt/src/main/org/apache/tools/mail/MailMessage.java) class, the alternative Constructors `MailMessage()`, `MailMessage(String)` and `setPort(int)` are never used. The tests use the `MailMessage(String, int)` constructor.
+  2. In the [**MailMessage**](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/098077beda8accd6a3453f6058214c6991ad8eae/src/main/org/apache/tools/mail/MailMessage.java) class, the alternative Constructors `MailMessage()`, `MailMessage(String)` and `setPort(int)` are never used. The tests use the `MailMessage(String, int)` constructor.
   <details>
     <summary>Click to View Detail Report of Mail</summary>
     <div align="center">
