@@ -1,0 +1,29 @@
+<project name="copy-test" basedir=".">
+
+    <property name="output" value="copy-temp"/>
+
+    <target name="setUp">
+        <mkdir dir="${output}"/>
+        <echo file="${output}/source.txt">Hello Ant Testing</echo>
+        <mkdir dir="${output}/src_dir"/>
+    </target>
+
+    <target name="tearDown">
+        <delete dir="${output}"/>
+    </target>
+
+    <target name="testValidCopy">
+        <copy file="${output}/source.txt" tofile="${output}/dest.txt"/>
+    </target>
+
+    <target name="testMissingSource">
+        <copy file="${output}/ghost.txt" tofile="${output}/dest.txt"/>
+    </target>
+
+    <target name="testDirectoryCopy">
+         <copy todir="${output}/dest_dir">
+            <fileset dir="${output}/src_dir"/>
+         </copy>
+    </target>
+
+</project>
