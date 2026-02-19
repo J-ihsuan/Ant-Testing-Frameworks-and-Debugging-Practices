@@ -257,7 +257,7 @@
 
   **Why it lends itself to FSM Modeling:**
 
-  Analysis of **Copy.java** identifies a state-dependent lifecycle with the following key characteristics:
+  Analysis of [**Copy.java**](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/master/src/main/org/apache/tools/ant/taskdefs/Copy.java) identifies a state-dependent lifecycle with the following key characteristics:
 
   - **Strict State Sequencing:** The task must pass through a Validation phase before any file operations occur. If the attributes (like file or todir) are invalid, the task terminates immediately via a BuildException or a strategic return, ensuring that the system never enters an unstable Execution state with invalid parameters.
 
@@ -303,14 +303,14 @@
   To validate the FSM model, I implemented **Transition Coverage testing** using **JUnit 4**. These tests ensure that the <copy\> task transitions correctly between states under both valid and invalid conditions.
 
   **a. Test Cases and Path Coverage:**
-  - [`testFullSuccessPath`](https://github.com/J-ihsuan/Apache-Ant-Testing-Frameworks-and-Debugging-Practices/blob/e869b959aaa478f0ca64d6f78b95a0f82c668a79/ApacheAnt/src/tests/junit/org/apache/tools/ant/taskdefs/CarolCopyFsmTest.java#L35C5-L46C6): Validates the transition `IDLE` -> `VALIDATING` -> `SCANNING` -> `PREPARING` -> `COPYING` -> `FINISHED`. It confirms that valid files are moved and the process ends successfully.
+  - [`testFullSuccessPath`](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/afb6ab9de7ba2fac5537bec9ab1670d15b9a65de/src/tests/junit/org/apache/tools/ant/taskdefs/CarolCopyFsmTest.java#L35-L46): Validates the transition `IDLE` -> `VALIDATING` -> `SCANNING` -> `PREPARING` -> `COPYING` -> `FINISHED`. It confirms that valid files are moved and the process ends successfully.
 
-  - [`testMissingDestDir`](https://github.com/J-ihsuan/Apache-Ant-Testing-Frameworks-and-Debugging-Practices/blob/e869b959aaa478f0ca64d6f78b95a0f82c668a79/ApacheAnt/src/tests/junit/org/apache/tools/ant/taskdefs/CarolCopyFsmTest.java#L52-L58): Validates the transition `VALIDATING` -> `FAILED`. It confirms the task throws a `BuildException` when a mandatory attribute is missing.
+  - [`testMissingDestDir`](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/afb6ab9de7ba2fac5537bec9ab1670d15b9a65de/src/tests/junit/org/apache/tools/ant/taskdefs/CarolCopyFsmTest.java#L53-L58): Validates the transition `VALIDATING` -> `FAILED`. It confirms the task throws a `BuildException` when a mandatory attribute is missing.
 
-  - [`testSourceFileMissing`](https://github.com/J-ihsuan/Apache-Ant-Testing-Frameworks-and-Debugging-Practices/blob/e869b959aaa478f0ca64d6f78b95a0f82c668a79/ApacheAnt/src/tests/junit/org/apache/tools/ant/taskdefs/CarolCopyFsmTest.java#L64-L73): Validates the transition `SCANNING` -> `FAILED`. It ensures the system correctly halts when the source resource cannot be located.
+  - [`testSourceFileMissing`](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/afb6ab9de7ba2fac5537bec9ab1670d15b9a65de/src/tests/junit/org/apache/tools/ant/taskdefs/CarolCopyFsmTest.java#L64-L73): Validates the transition `SCANNING` -> `FAILED`. It ensures the system correctly halts when the source resource cannot be located.
 
   **b. Implementation Details:**
-  - Test File: [CarolCopyFsmTest.java](https://github.com/J-ihsuan/Apache-Ant-Testing-Frameworks-and-Debugging-Practices/blob/c_branch/ApacheAnt/src/tests/junit/org/apache/tools/ant/taskdefs/CarolCopyFsmTest.java)
+  - Test File: [CarolCopyFsmTest.java](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/master/src/tests/junit/org/apache/tools/ant/taskdefs/CarolCopyFsmTest.java#L64-L73)
   - Execution Command:
     ```
     cd ApacheAnt
