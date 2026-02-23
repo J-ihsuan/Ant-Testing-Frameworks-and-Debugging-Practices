@@ -1,6 +1,6 @@
 
 <details>
-  <summary><H1> Part 1. Introduction. Set Up. Functional Testing and Partitioning. </H1></summary>
+  <summary><H1> Part 1. Introduction. Set Up. Functional Testing and Partitioning </H1></summary>
 
   ## 1. Introduction
   ### 1.1 Project Overview & Purpose
@@ -229,7 +229,7 @@
 </details>
 
 <details>
-  <summary><H1> Part 2. Functional Testing and Finite State Machines. </H1></summary>
+  <summary><H1> Part 2. Functional Testing and Finite State Machines </H1></summary>
 
   ## 1. Finite Model-Based Testing
   ### The Utility of Finite Models in Testing
@@ -447,7 +447,7 @@
 </details>
 
 <details>
-  <summary><H1> Part 3. White Box Testing and Coverage. </H1></summary>
+  <summary><H1> Part 3. White Box Testing and Coverage </H1></summary>
 
   ## 1. Structural Testing
   Structural testing, commonly referred to **White-Box Testing**, is a software testing method to examines the internal code, structure, logic, and design.
@@ -912,5 +912,28 @@ The new test class `CarolExecuteOnTest` was designed to be a functional verifica
     - **Test Logic**: I invoked multiple setters (e.g., setVerbose, setParallel, setSkipEmptyFilesets) to cover configuration logic, and then triggered execute() by adding a valid FileSet (using the test file itself as input) to force the task into its main execution loop.
 
     - **Outcome**: This validated the integration between ExecuteOn and the underlying ExecTask, successfully bringing the class from a completely untested state (0%) to having its core execution path and parameter validation logic verified.
+
+</details>
+
+
+<details>
+  <summary><H1> Part 4. Continuous Integration </H1></summary>
+
+  ## 1. Continuous Integration
+  Continuous Integration (CI) is a standard process and practice in modern software development. The core principle of CI is “small, frequent increments.” It requires developers within a team to commit and merge their completed code into a shared main repository (such as the main branch on GitHub) several times a day. Instead of waiting weeks to integrate everyone's work, CI dictates that every code commit automatically triggers an automated build and testing sequence to verify the new code.
+
+  **Purpose of CI** 
+  * **Early Bug Detection**: CI helps identify and fix integration errors immediately when engineers are most familiar with its logic. Catching bugs at this stage minimizes repair costs and maximizes speed.
+
+  * **Eliminate “It works on my machine” dilemma**: CI provides a consistent, isolated cloud testing environment, ensuring code doesn't only function on a single developer's machine.
+
+  * **Ensure Software Stability**: Automated testing provides a safety net, allowing engineers to refactor or add new features without fear of accidentally breaking the entire system, which keeps the main codebase stable and deployable.
+
+  * **Prevent Integration Hell**: CI eliminates the massive merge conflicts and system crashes that occur when multiple developers try to combine large batches of code all at once.
+
+  * **Automate Repetitive Tasks & Save Time**: It frees developers from having to manually compile code and run tests, allowing the team to focus on writing features and software developing.
+
+  ## 2.
+
 
 </details>
