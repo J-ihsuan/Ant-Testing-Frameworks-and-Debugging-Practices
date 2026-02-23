@@ -1,6 +1,6 @@
 
 <details>
-  <summary><H1> Part 1. Introduction. Set Up. Functional Testing and Partitioning. </H1></summary>
+  <summary><H1> Part 1. Introduction. Set Up. Functional Testing and Partitioning </H1></summary>
 
   ## 1. Introduction
   ### 1.1 Project Overview & Purpose
@@ -229,7 +229,7 @@
 </details>
 
 <details>
-  <summary><H1> Part 2. Functional Testing and Finite State Machines. </H1></summary>
+  <summary><H1> Part 2. Functional Testing and Finite State Machines </H1></summary>
 
   ## 1. Finite Model-Based Testing
   ### The Utility of Finite Models in Testing
@@ -447,7 +447,7 @@
 </details>
 
 <details>
-  <summary><H1> Part 3. White Box Testing and Coverage. </H1></summary>
+  <summary><H1> Part 3. White Box Testing and Coverage </H1></summary>
 
   ## 1. Structural Testing
   Structural testing, commonly referred to **White-Box Testing**, is a software testing method to examines the internal code, structure, logic, and design.
