@@ -770,7 +770,7 @@ The new test cases were designed to target the "red areas" identified in the ini
 
 
 
-### 3.3 Coverage Improvement for <Copy> Class (Author: Chien-Tzu Yeh)
+### 3.3 Coverage Improvement for \<Copy> Class (Author: Chien-Tzu Yeh)
 To improve the coverage of the `Copy` class, I focused on "unreachable" private methods and complex attribute validations that were missed by the original test suite. I implemented `CarolBoostTest.java` to target these specific areas.
 
 **Test File**
