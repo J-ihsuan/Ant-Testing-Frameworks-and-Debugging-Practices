@@ -937,7 +937,7 @@ The new test class `CarolExecuteOnTest` was designed to be a functional verifica
   - **Pre-configured Environments**: It provides clean, managed virtual machines, which solved our local environment dependency issues.
 
   ### 2.2 Configuration Details:
-  - **Workflow File**: Defined in [.github/workflows/ci.yml](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/abfbb342ddcd551d9086bbf099ce96f35c5ed4e1/.github/workflows/ci.yml).
+  - **Workflow File**: Defined in [.github/workflows/ci.yml](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/da3347189b3adf1762a543bc7e3db40a60115858/.github/workflows/ci.yml).
   - **Runner Environment**: ubuntu-latest virtual machine.
   - **Java Version**: JDK 17 (Temurin distribution).
   - **Build Command**: `ant junit-tests`. This command automatically triggers all `Junit` tests defined in the project's `build.xml`.
@@ -971,7 +971,7 @@ The new test class `CarolExecuteOnTest` was designed to be a functional verifica
 
   For our group project, we realized that running CI checks immediately upon pushing to a personal branch provides valuable real-time feedback. To implement this **"Fail Fast"** strategy and verify our CI pipeline detects **new code changes**, we conducted the following test:
 
-  - **Action**: Pushed a new test commit to our development branch, `e_branch`.
+  - **Action**: Pushed a new test [`CITest.java`](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/da3347189b3adf1762a543bc7e3db40a60115858/src/tests/junit/org/apache/tools/ant/CITest.java) commit to our development branch, `e_branch`.
   - **Issue**: Initially, the GitHub Actions workflow did not trigger. We discovered that our `ci.yml` file was strictly configured to only run on the `master` branch (`on: push: branches: [ master ]`).
   - **Solution**: We updated the trigger configuration to `on: push: branches: [ master, "e_branch" ]` to ensure the CI pipeline actively monitors our branch. After pushing this update, the CI system triggered immediately. We also modified and pushed the test case again to fully verify our strategy.
   - **Result**: As shown in the log screenshot below, our custom test was successfully detected and executed, confirming that our branch-level testing strategy works perfectly.
