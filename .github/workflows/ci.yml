@@ -2,7 +2,7 @@ name: Java Ant CI
 
 on:
   push:
-    branches: [ master ]
+    branches: [ master, "e_branch" ]
   pull_request:
     branches: [ master ]
 

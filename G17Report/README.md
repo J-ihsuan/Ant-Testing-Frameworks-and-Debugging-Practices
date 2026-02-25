@@ -605,7 +605,7 @@ According to the `JaCoCo` report, while the core functionality is well-tested, t
 
 ----
 
-### 2.7 <ExecuteOn> Class Coverage Summary (Author: Chien-Tzu Yeh)
+### 2.7 \<ExecuteOn> Class Coverage Summary (Author: Chien-Tzu Yeh)
 The `ExecuteOn` class represents a significant gap in the current test suite. It is completely untested, with **0% coverage** across all metrics. This class is responsible for executing system commands on a set of files, which is a critical functionality for build automation.
 
 |                  | Total | Missed | Covered | Coverage % | Description                |
@@ -770,7 +770,7 @@ The new test cases were designed to target the "red areas" identified in the ini
 
 
 
-### 3.3 Coverage Improvement for <Copy> Class (Author: Chien-Tzu Yeh)
+### 3.3 Coverage Improvement for \<Copy> Class (Author: Chien-Tzu Yeh)
 To improve the coverage of the `Copy` class, I focused on "unreachable" private methods and complex attribute validations that were missed by the original test suite. I implemented `CarolBoostTest.java` to target these specific areas.
 
 **Test File**
@@ -916,13 +916,17 @@ The new test class `CarolExecuteOnTest` was designed to be a functional verifica
 </details>
 
 <details>
-  <summary><H1> Part 4. Continuous Integration. </H1></summary>
+  <summary><H1> Part 4. Continuous Integration </H1></summary>
   
-  ## 1. What is Continuous Integration (CI) and its Purpose?
-  **Continuous Integration (CI)** is a software development practice where team members frequently integrate their work into a shared repository.
-  - **Purpose**: To detect integration errors as early as possible (Fail Fast).
-  - **Automation**: It replaces manual testing by automatically building and testing the system whenever code changes are pushed.
-  - **Reliability**: Ensures the master branch remains stable and deployable at all times.
+  ## 1. Continuous Integration
+  **Continuous Integration (CI)** is a modern software development practice where team members integrate their work into a shared repository (such as the main branch on GitHub) several times a day. Instead of waiting weeks to integrate everyone's work, CI dictates that every code commit automatically triggers an automated build and testing sequence to verify the new code.  
+
+  **Purpose**
+  - **Early Bug Detection**: To detect integration errors as early as possible (Fail Fast) when engineers are most familiar with its logic.
+  - **Eliminate “It works on my machine” dilemma**: CI provides a consistent, isolated cloud testing environment, ensuring code doesn't only function on a single developer's machine.
+  - **Automation & Time Saving**: It replaces manual testing by automatically building and testing the system whenever code changes are pushed, allowing the team to focus on writing features and software developing.
+  - **Reliability**: Automated testing provides a safety net, ensuring the master branch remains stable and deployable at all times.
+  - **Prevent Integration Hell**: CI eliminates the massive merge conflicts and system crashes that occur when multiple developers try to combine large batches of code all at once.
 
   ## 2. CI System Configuration
   We selected **GitHub Actions** as our cloud-based CI system for this project.
@@ -933,10 +937,10 @@ The new test class `CarolExecuteOnTest` was designed to be a functional verifica
   - **Pre-configured Environments**: It provides clean, managed virtual machines, which solved our local environment dependency issues.
 
   ### 2.2 Configuration Details:
-  - **Workflow File**: Defined in .github/workflows/ci.yml.
+  - **Workflow File**: Defined in [.github/workflows/ci.yml](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/abfbb342ddcd551d9086bbf099ce96f35c5ed4e1/.github/workflows/ci.yml).
   - **Runner Environment**: ubuntu-latest virtual machine.
   - **Java Version**: JDK 17 (Temurin distribution).
-  - **Build Command**: ant junit-tests. This command automatically triggers all unit tests defined in the project's build.xml.
+  - **Build Command**: `ant junit-tests`. This command automatically triggers all `Junit` tests defined in the project's `build.xml`.
 
   ## 3. Issues Encountered & Solutions
   During the implementation, we encountered several technical challenges that highlight the value of a robust CI environment:
@@ -962,5 +966,17 @@ The new test class `CarolExecuteOnTest` was designed to be a functional verifica
 
   ![](Image/CI_succeed.png) 
   ![](Image/CIRunJUnit_Succeed.jpeg)
+
+  ### 4.3 CI Trigger Verification (New Test Case on Branch-Level)
+
+  For our group project, we realized that running CI checks immediately upon pushing to a personal branch provides valuable real-time feedback. To implement this **"Fail Fast"** strategy and verify our CI pipeline detects **new code changes**, we conducted the following test:
+
+  - **Action**: Pushed a new test commit to our development branch, `e_branch`.
+  - **Issue**: Initially, the GitHub Actions workflow did not trigger. We discovered that our `ci.yml` file was strictly configured to only run on the `master` branch (`on: push: branches: [ master ]`).
+  - **Solution**: We updated the trigger configuration to `on: push: branches: [ master, "e_branch" ]` to ensure the CI pipeline actively monitors our branch. After pushing this update, the CI system triggered immediately. We also modified and pushed the test case again to fully verify our strategy.
+  - **Result**: As shown in the log screenshot below, our custom test was successfully detected and executed, confirming that our branch-level testing strategy works perfectly.
+
+  ![](Image/CIonBranch.png) 
+  ![](Image/CIonNewTestCase.png)
 
 </detail>
