@@ -7,6 +7,6 @@ public class CITest {
     @Test
     public void testForCI() {
         // Simple test to prove CI work on new test case
-        assertEquals(2, 1 + 1); 
+        assertEquals(3, 2 + 1); 
     }
 }

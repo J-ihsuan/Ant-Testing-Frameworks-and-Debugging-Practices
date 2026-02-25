@@ -915,25 +915,52 @@ The new test class `CarolExecuteOnTest` was designed to be a functional verifica
 
 </details>
 
-
 <details>
-  <summary><H1> Part 4. Continuous Integration </H1></summary>
+  <summary><H1> Part 4. Continuous Integration. </H1></summary>
+  
+  ## 1. What is Continuous Integration (CI) and its Purpose?
+  **Continuous Integration (CI)** is a software development practice where team members frequently integrate their work into a shared repository.
+  - **Purpose**: To detect integration errors as early as possible (Fail Fast).
+  - **Automation**: It replaces manual testing by automatically building and testing the system whenever code changes are pushed.
+  - **Reliability**: Ensures the master branch remains stable and deployable at all times.
 
-  ## 1. Continuous Integration
-  Continuous Integration (CI) is a standard process and practice in modern software development. The core principle of CI is “small, frequent increments.” It requires developers within a team to commit and merge their completed code into a shared main repository (such as the main branch on GitHub) several times a day. Instead of waiting weeks to integrate everyone's work, CI dictates that every code commit automatically triggers an automated build and testing sequence to verify the new code.
+  ## 2. CI System Configuration
+  We selected **GitHub Actions** as our cloud-based CI system for this project.
 
-  **Purpose of CI** 
-  * **Early Bug Detection**: CI helps identify and fix integration errors immediately when engineers are most familiar with its logic. Catching bugs at this stage minimizes repair costs and maximizes speed.
+  ### 2.1 Why GitHub Actions?
+  - **Seamless Integration**: Since our project is already hosted on GitHub, Actions is built-in and **requires no third-party account setup**.
+  - **Workflow Transparency**: It allows us to see the build status (Success/Failure) directly within Pull Requests.
+  - **Pre-configured Environments**: It provides clean, managed virtual machines, which solved our local environment dependency issues.
 
-  * **Eliminate “It works on my machine” dilemma**: CI provides a consistent, isolated cloud testing environment, ensuring code doesn't only function on a single developer's machine.
+  ### 2.2 Configuration Details:
+  - **Workflow File**: Defined in .github/workflows/ci.yml.
+  - **Runner Environment**: ubuntu-latest virtual machine.
+  - **Java Version**: JDK 17 (Temurin distribution).
+  - **Build Command**: ant junit-tests. This command automatically triggers all unit tests defined in the project's build.xml.
 
-  * **Ensure Software Stability**: Automated testing provides a safety net, allowing engineers to refactor or add new features without fear of accidentally breaking the entire system, which keeps the main codebase stable and deployable.
+  ## 3. Issues Encountered & Solutions
+  During the implementation, we encountered several technical challenges that highlight the value of a robust CI environment:
 
-  * **Prevent Integration Hell**: CI eliminates the massive merge conflicts and system crashes that occur when multiple developers try to combine large batches of code all at once.
+  - **Local Environment Dependencies**: When attempting to install Apache Ant on macOS via Homebrew, the system required a full installation of **Xcode (over 12GB)**. We decided to bypass this by leveraging GitHub Actions' pre-installed Ant environment, saving time and storage.
+  - **Missing Test Suites**: Running the default `ant test` locally failed due to a missing `AntUnit` library dependency. After analyzing the `build.xml` and logs, we adjusted the command to `ant junit-tests`. This allowed us to successfully run the core JUnit test cases without the optional AntUnit extension.
 
-  * **Automate Repetitive Tasks & Save Time**: It frees developers from having to manually compile code and run tests, allowing the team to focus on writing features and software developing.
+  ## 4. Verification & Results
+  ### 4.1 Local Verification
 
-  ## 2.
+  Before pushing to CI, we verified the test suite locally using the `ant junit-tests` command to ensure the code logic was sound.
+  ```
+  Status: Local Build Successful. JUnit Report generated with 100% pass rate.
+  ```
+  ![](Image/Local_JUnitTest_Success.jpg)
 
+  ### 4.2 CI Verification (GitHub Actions)
+  
+  As shown in the screenshots below, GitHub Actions automatically triggers a build whenever code is merged into `master`.
 
-</details>
+  - **Job Name**: build-and-test (Defined in our YAML to handle environment setup and test execution).
+  - **Result**: Both the Pull Request checks and the final merge to `master` show a **green checkmark (Success)**, proving the system builds correctly and all test cases passed in a clean cloud environment.
+
+  ![](Image/CI_succeed.png) 
+  ![](Image/CIRunJUnit_Succeed.jpeg)
+
+</detail>
