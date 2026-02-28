@@ -3,8 +3,12 @@ name: Java Ant CI
 on:
   push:
     branches: [ master, "e_branch" ]
+    paths-ignore:
+      - 'G17Report/**'
   pull_request:
     branches: [ master ]
+    paths-ignore:
+      - 'G17Report/**'
 
 jobs:
   build-and-test:
