@@ -979,4 +979,33 @@ The new test class `CarolExecuteOnTest` was designed to be a functional verifica
   ![](Image/CIonBranch.png) 
   ![](Image/CIonNewTestCase.png)
 
-</detail>
+</details>
+
+<details>
+  <summary><H1> Part 5. Testable Design & Mocking </H1></summary>
+
+## 1. Testable Design
+Testable Design is about how to write code that is easy to controll, test and observe.  
+The key aspects include:  
+* **Testing as a Design Tool**: Thinking about “How will I test this later?” when designing code. If unsure how to test a function, it's indicating the function's design itself is flawed. 
+
+* **Single Responsibility**: A class or method should do exactly one thing.     
+
+* **Controllability**: The ability to easily manipulate the state and inputs of the component under test. Instead of global states or hardcoded data, inputs and states should be passed in externally.     
+
+* **Observability**: The ability to easily verify the results of an operation. Such as returning a clear result (true/false) or throwing exception.     
+
+* **Modularity & Decoupling**: Systems should be built like Lego blocks—composed of many small pieces.
+
+Goals of Testable Design:
+
+* **Enable Automated Testing**: Allow developers to write unit tests that run reliably in continuous integration (CI) environments without requiring complex setup of databases or servers.
+
+* **Facilitate Safe Refactoring**: With testable design, developers can build a robust safety net of unit tests. This ensures that future changes do not break existing functionality.
+
+* **Improve Fault Isolation**: In testable design, a failing test immediately points to the exact class or method that contains the defect.
+
+* **Improving Code Quality**: Testable design forces developers to write cleaner, more understandable and maintainable code. **"High testability is often a byproduct of excellent software architecture."**
+
+
+</details>
