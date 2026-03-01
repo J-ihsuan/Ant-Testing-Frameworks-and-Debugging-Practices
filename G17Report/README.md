@@ -979,4 +979,166 @@ The new test class `CarolExecuteOnTest` was designed to be a functional verifica
   ![](Image/CIonBranch.png) 
   ![](Image/CIonNewTestCase.png)
 
-</detail>
+</details>
+
+<details>
+  <summary><H1> Part 5. Testable Design & Mocking </H1></summary>
+
+  ## 1. Testable Design
+  Testable Design is about how to write code that is easy to controll, test and observe.  
+  The key aspects include:  
+  * **Testing as a Design Tool**: Thinking about “How will I test this later?” when designing code. If unsure how to test a function, it's indicating the function's design itself is flawed. 
+
+  * **Single Responsibility**: A class or method should do exactly one thing.     
+
+  * **Controllability**: The ability to easily manipulate the state and inputs of the component under test. Instead of global states or hardcoded data, inputs and states should be passed in externally.     
+
+  * **Observability**: The ability to easily verify the results of an operation. Such as returning a clear result (true/false) or throwing exception.     
+
+  * **Modularity & Decoupling**: Systems should be built like Lego blocks—composed of many small pieces.
+
+  Goals of Testable Design:
+
+  * **Enable Automated Testing**: Allow developers to write unit tests that run reliably in continuous integration (CI) environments without requiring complex setup of databases or servers.
+
+  * **Facilitate Safe Refactoring**: With testable design, developers can build a robust safety net of unit tests. This ensures that future changes do not break existing functionality.
+
+  * **Improve Fault Isolation**: In testable design, a failing test immediately points to the exact class or method that contains the defect.
+
+  * **Improving Code Quality**: Testable design forces developers to write cleaner, more understandable and maintainable code. **"High testability is often a byproduct of excellent software architecture."**
+
+  ## 1.1 Bad Testable Design - (Author: Eleanor)
+  ### RemoveFiles() Method
+  In [Delete.java]() file, the [removeFiles()]() method contains hardcoded dependencies and hidden state, making it a bad testable design:
+
+  ```java
+  protected void removeFiles(File d, String[] files, String[] dirs) {
+      // [skip...]
+      if (dirs.length > 0 && includeEmpty) {
+          int dirCount = 0;
+          for (int j = dirs.length - 1; j >= 0; j--) {
+
+              // Bad Design 1: Hardcoded I/O instantiation
+              File currDir = new File(d, dirs[j]);
+
+              // Bad Design 2: Direct interaction with the physical disk
+              String[] dirFiles = currDir.list();
+              if (dirFiles == null || dirFiles.length == 0) {
+
+                  // Bad Design 3: Observability (Hidden State Logging)
+                  log("Deleting " + currDir.getAbsolutePath(),
+                          quiet ? Project.MSG_VERBOSE : verbosity);
+
+                  // Bad Design 4: Hardcoded OS-dependent delete
+                  if (!delete(currDir)) {
+
+                      // Bad Design 5: Observability (Hidden Control Flow)
+                      handle("Unable to delete directory " + currDir.getAbsolutePath());
+                  } else {
+                      dirCount++;
+                  }
+      // [skip...]
+  }
+  ```
+
+  ### What would be prevented with the code?
+  * **Loss of Controllability**  
+    * `new File()` and `currDir.list()` interact directly with the physical hard drive, we cannot easily simulate edge cases in a unit test. Like when `currDir.list()` returns `null`
+
+    * Developer must write a setup script to actually create a physical parent directory on the disk before running the test.
+
+    * If the test crashes midway, the physical files might not be cleaned up. This leads to slow and flaky tests.
+
+  * **Loss of Observability**: 
+    * The `log()` and `handle()` methods rely on implicit internal states (like `quiet`, `verbosity`). These methods push strings into Ant's hidden `Project` system or silently swallow errors, make it impossible to intercept and assert side effects.
+
+  ### How to fix
+  To fix the code, we apply the Dependency Injection (DI) principle to decouple the method from physical I/O and hidden state in a new file [DeleteTestable]().
+
+  * **Add [`FileSystemD`]() interface**: Instead of calling `new File()` and `list()`, inject this interface so we can supply a in-memory "Stub File System" during testing.
+    ```java
+    interface FileSystemD {
+      File setFile(File parent, String childName);
+      String[] list(File dir);
+      boolean delete(File f);
+    }
+    ```
+
+  * **Add [`TaskObserver`]() (Log/ErrorHandler) interface**: Pass the side-effects to an injected observer, we can easily capture and assert the generated messages during testing.
+    ```java
+    interface TaskObserver {
+      void logInfo(String message);
+      void handleErrorInfo(String errorMessage);
+    }
+    ```
+
+  ### Implement Test Case - [DeleteTDTest.java]()
+  In the `@Before` setup method, we implement:
+  * The Stub ([FileSystemD()]()): Implement an anonymous class that acts as a mock file system. It is hardcoded to respond to specific string inputs.
+    ```java
+    public void setUp() {
+        task = new DeleteTestable();
+        baseDir = new File("/fake/base");
+        spyObserver = new SpyObserver();
+
+        // Create a Stub File System
+        stubFs = new FileSystemD() {
+            @Override
+            public File setFile(File parent, String childName) {
+                return new File(parent, childName);
+            }
+
+            @Override
+            public String[] list(File dir) {
+                // Simulate a non-empty directory
+                if (dir.getName().equals("notEmptyDir")) {
+                    return new String[] {"hidden_file.txt"}; 
+                }
+                // Simulate null directories
+                if (dir.getName().equals("nullDir")) {
+                    return null; 
+                }
+                // Simulate empty directories
+                return new String[0]; 
+            }
+
+            @Override
+            public boolean delete(File f) {
+                // Simulate an OS lock causing deletion failure
+                if (f.getName().equals("locked.txt") || f.getName().equals("lockedDir")) {
+                    return false; 
+                }
+                // Simulate successful deletion 
+                return true; 
+            }
+        };
+    }
+    ```
+  * The Spy ([SpyObserver()]()): Create a custom implementation that intercepts all `logInfo` and `handleErrorInfo` calls.
+    ```java
+    class SpyObserver implements TaskObserver {
+        public List<String> logs = new ArrayList<>();
+        public List<String> errors = new ArrayList<>();
+
+        @Override
+        public void logInfo(String message) { logs.add(message); }
+        @Override
+        public void handleErrorInfo(String errorMessage) { errors.add(errorMessage); }
+    }
+    ```
+
+  **Test Cases Breakdown**
+  
+  | Test Case | Scenario | Verification |
+  | :-------- | :------- | :----------- |
+  | [testDeletesNormalFile()]() | Delete a standard file `normal.txt` | Asserts the Spy captured a log confirming the successful deletion of `normal.txt` |
+  | [testHandlesLockedFileError()]() | Delete a file `locked.txt` that can not be deleted | Asserts the system does not crash and the Spy captured a error containing the failure message of `locked.txt` |
+  | [testDeletesEmptyDir()]() | Delete an empty diectory `emptyDir` | Asserts the Spy captured a log confirming the successful deletion of `emptyDir` and summary log "Deleted 1 directory" |
+  | [testIgnoresNotEmptyDir()]() | Delete a non-empty diectory `notEmptyDir` that will be skiped | Asserts the method skips the directory. The Spy confirms no deletion logs were generated |
+  | [testHandlesLockedDirError()]() | Delete a diectory `lockedDir` that can not be deleted | Asserts the code enters the deletion block (logs the attempt), but catches the `false` return and triggers an "Unable to delete directory" error in the Spy. |
+  | [testHandlesNullDir()]() | Delete a diectory `nullDir` simulating an edge case where `File.list()` returns `null` |  Asserts the code handles the `null` without throwing a `NullPointerException`, treats it as an empty directory, and Spy captured a log confirming the successful deletion |
+
+  
+
+
+</details>
