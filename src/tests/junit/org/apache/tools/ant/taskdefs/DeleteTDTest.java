@@ -56,7 +56,7 @@ public class DeleteTDTest {
             @Override
             public boolean delete(File f) {
                 // Simulate an OS lock causing deletion failure
-                if (f.getName().equals("locked.txt") || f.getName().equals("lockedEmptyDir")) {
+                if (f.getName().equals("locked.txt") || f.getName().equals("lockedDir")) {
                     return false; 
                 }
                 // Simulate successful deletion 
@@ -108,14 +108,14 @@ public class DeleteTDTest {
     }
 
     @Test
-    public void testHandlesLockedDirectoryError() {
+    public void testHandlesLockedDirError() {
         // Act: Pass only a single empty directory lockedEmptyDir that CANNOT be deleted
-        task.removeFilesTestable(baseDir, new String[]{}, new String[]{"lockedEmptyDir"}, true, stubFs, spyObserver);
+        task.removeFilesTestable(baseDir, new String[]{}, new String[]{"lockedDir"}, true, stubFs, spyObserver);
         
         // Assert:
         // 1. Verify it enters the first 'if' block and logs
-        assertTrue("Should log the attempt to delete lockedEmptyDir.", 
-            spyObserver.logs.stream().anyMatch(msg -> msg.contains("lockedEmptyDir")));
+        assertTrue("Should log the attempt to delete lockedDir.", 
+            spyObserver.logs.stream().anyMatch(msg -> msg.contains("lockedDir")));
             
         // 2. Verify it enters the second 'if' block and correctly calls the error handler
         assertTrue("Should handle error when lockedEmptyDir fails to delete.", 
@@ -123,7 +123,7 @@ public class DeleteTDTest {
     }
 
     @Test
-    public void testHandlesNullDirectory() {
+    public void testHandlesNullDir() {
         // Act: Pass a directory "nullDir" return null
         task.removeFilesTestable(baseDir, new String[]{}, new String[]{"nullDir"}, true, stubFs, spyObserver);
         
