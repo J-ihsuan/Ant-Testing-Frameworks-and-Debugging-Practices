@@ -984,28 +984,70 @@ The new test class `CarolExecuteOnTest` was designed to be a functional verifica
 <details>
   <summary><H1> Part 5. Testable Design & Mocking </H1></summary>
 
-## 1. Testable Design
-Testable Design is about how to write code that is easy to controll, test and observe.  
-The key aspects include:  
-* **Testing as a Design Tool**: Thinking about “How will I test this later?” when designing code. If unsure how to test a function, it's indicating the function's design itself is flawed. 
+  ## 1. Testable Design
+  Testable Design is about how to write code that is easy to controll, test and observe.  
+  The key aspects include:  
+  * **Testing as a Design Tool**: Thinking about “How will I test this later?” when designing code. If unsure how to test a function, it's indicating the function's design itself is flawed. 
 
-* **Single Responsibility**: A class or method should do exactly one thing.     
+  * **Single Responsibility**: A class or method should do exactly one thing.     
 
-* **Controllability**: The ability to easily manipulate the state and inputs of the component under test. Instead of global states or hardcoded data, inputs and states should be passed in externally.     
+  * **Controllability**: The ability to easily manipulate the state and inputs of the component under test. Instead of global states or hardcoded data, inputs and states should be passed in externally.     
 
-* **Observability**: The ability to easily verify the results of an operation. Such as returning a clear result (true/false) or throwing exception.     
+  * **Observability**: The ability to easily verify the results of an operation. Such as returning a clear result (true/false) or throwing exception.     
 
-* **Modularity & Decoupling**: Systems should be built like Lego blocks—composed of many small pieces.
+  * **Modularity & Decoupling**: Systems should be built like Lego blocks—composed of many small pieces.
 
-Goals of Testable Design:
+  Goals of Testable Design:
 
-* **Enable Automated Testing**: Allow developers to write unit tests that run reliably in continuous integration (CI) environments without requiring complex setup of databases or servers.
+  * **Enable Automated Testing**: Allow developers to write unit tests that run reliably in continuous integration (CI) environments without requiring complex setup of databases or servers.
 
-* **Facilitate Safe Refactoring**: With testable design, developers can build a robust safety net of unit tests. This ensures that future changes do not break existing functionality.
+  * **Facilitate Safe Refactoring**: With testable design, developers can build a robust safety net of unit tests. This ensures that future changes do not break existing functionality.
 
-* **Improve Fault Isolation**: In testable design, a failing test immediately points to the exact class or method that contains the defect.
+  * **Improve Fault Isolation**: In testable design, a failing test immediately points to the exact class or method that contains the defect.
 
-* **Improving Code Quality**: Testable design forces developers to write cleaner, more understandable and maintainable code. **"High testability is often a byproduct of excellent software architecture."**
+  * **Improving Code Quality**: Testable design forces developers to write cleaner, more understandable and maintainable code. **"High testability is often a byproduct of excellent software architecture."**
 
+  ### 1.1 Bad Testable Design - (Author: Eleanor)
+  #### RemoveFiles Method
+  In [Delete.java]() file, the [removeFiles]() method contains hardcoded dependencies and hidden state, making it a bad testable design:
+
+  ```java
+  protected void removeFiles(File d, String[] files, String[] dirs) {
+      // [skip...]
+      if (dirs.length > 0 && includeEmpty) {
+          int dirCount = 0;
+          for (int j = dirs.length - 1; j >= 0; j--) {
+
+              // Bad Design 1: Hardcoded I/O instantiation
+              File currDir = new File(d, dirs[j]);
+
+              // Bad Design 2: Direct interaction with the physical disk
+              String[] dirFiles = currDir.list();
+              if (dirFiles == null || dirFiles.length == 0) {
+
+                  // Bad Design 3: Observability (Hidden State Logging)
+                  log("Deleting " + currDir.getAbsolutePath(),
+                          quiet ? Project.MSG_VERBOSE : verbosity);
+
+                  // Bad Design 4: Hardcoded OS-dependent delete
+                  if (!delete(currDir)) {
+
+                      // Bad Design 5: Observability (Hidden Control Flow)
+                      handle("Unable to delete directory " + currDir.getAbsolutePath());
+                  } else {
+                      dirCount++;
+                  }
+      // [skip...]
+  }
+  ```
+
+  #### What would be prevented with the code?
+  * **Loss of Controllability**  
+    * `new File()` and `currDir.list()` interact directly with the physical hard drive, we cannot easily simulate edge cases in a unit test. Like when `currDir.list()` returns `null`
+    * Developer must write a setup script to actually create a physical parent directory on the disk before running the test.
+    * If the test crashes midway, the physical files might not be cleaned up. This leads to slow and flaky tests.
+
+  * **Loss of Observability**: 
+    * The `log()` and `handle()` methods rely on implicit internal states (like `quiet`, `verbosity`). These methods push strings into Ant's hidden `Project` system or silently swallow errors, make it  impossible to cleanly intercept and assert these side effects.
 
 </details>
