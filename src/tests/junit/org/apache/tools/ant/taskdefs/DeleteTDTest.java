@@ -65,9 +65,12 @@ public class DeleteTDTest {
         };
     }
 
+
+    // --- Test Case 1: Verify a standard file is deleted and logged ---
+
     @Test
     public void testDeletesNormalFile() {
-        // Act: Pass only normal.txt
+        // Pass only normal.txt
         task.removeFilesTestable(baseDir, new String[]{"normal.txt"}, new String[]{}, true, stubFs, spyObserver);
         
         // Assert: Verify the successful deletion log
@@ -75,9 +78,12 @@ public class DeleteTDTest {
             spyObserver.logs.stream().anyMatch(msg -> msg.contains("normal.txt")));
     }
 
+
+    // --- Test Case 2: Verify an error is handle when a file fails to delete ---
+
     @Test
     public void testHandlesLockedFileError() {
-        // Act: Pass only locked.txt
+        // Pass only locked.txt
         task.removeFilesTestable(baseDir, new String[]{"locked.txt"}, new String[]{}, true, stubFs, spyObserver);
         
         // Assert: Verify the error handler was triggered
@@ -85,9 +91,12 @@ public class DeleteTDTest {
             spyObserver.errors.stream().anyMatch(err -> err.contains("locked.txt")));
     }
 
+
+    // --- Test Case 3: Verify an empty directory is deleted ---
+
     @Test
     public void testDeletesEmptyDir() {
-        // Act: Pass only emptyDir
+        // Pass only emptyDir
         task.removeFilesTestable(baseDir, new String[]{}, new String[]{"emptyDir"}, true, stubFs, spyObserver);
         
         // Assert
@@ -97,9 +106,12 @@ public class DeleteTDTest {
             spyObserver.logs.stream().anyMatch(msg -> msg.contains("Deleted 1 directory")));
     }
 
+
+    // --- Test Case 4: Verify a non-empty directory is skipped ---
+
     @Test
     public void testIgnoresNotEmptyDir() {
-        // Act: Pass only notEmptyDir
+        // Pass only notEmptyDir
         task.removeFilesTestable(baseDir, new String[]{}, new String[]{"notEmptyDir"}, true, stubFs, spyObserver);
         
         // Assert
@@ -107,9 +119,12 @@ public class DeleteTDTest {
             spyObserver.logs.stream().anyMatch(msg -> msg.contains("notEmptyDir")));
     }
 
+
+    // --- Test Case 5: Verify an error is handled when an empty directory fails to delete ---
+
     @Test
     public void testHandlesLockedDirError() {
-        // Act: Pass only a single empty directory lockedEmptyDir that CANNOT be deleted
+        // Pass only a single empty directory lockedEmptyDir that CANNOT be deleted
         task.removeFilesTestable(baseDir, new String[]{}, new String[]{"lockedDir"}, true, stubFs, spyObserver);
         
         // Assert:
@@ -122,9 +137,12 @@ public class DeleteTDTest {
             spyObserver.errors.stream().anyMatch(err -> err.contains("Unable to delete directory") && err.contains("lockedEmptyDir")));
     }
 
+
+    // --- Test Case 6: Verify a null directory is deleted and logged ---
+
     @Test
     public void testHandlesNullDir() {
-        // Act: Pass a directory "nullDir" return null
+        // Pass a directory "nullDir" return null
         task.removeFilesTestable(baseDir, new String[]{}, new String[]{"nullDir"}, true, stubFs, spyObserver);
         
         // Assert: 

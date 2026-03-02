@@ -984,7 +984,7 @@ The new test class `CarolExecuteOnTest` was designed to be a functional verifica
 <details>
   <summary><H1> Part 5. Testable Design & Mocking </H1></summary>
 
-  ## 1. Testable Design
+  ## **1. Testable Design**
   Testable Design is about how to write code that is easy to controll, test and observe.  
   The key aspects include:  
   * **Testing as a Design Tool**: Thinking about “How will I test this later?” when designing code. If unsure how to test a function, it's indicating the function's design itself is flawed. 
@@ -1007,9 +1007,9 @@ The new test class `CarolExecuteOnTest` was designed to be a functional verifica
 
   * **Improving Code Quality**: Testable design forces developers to write cleaner, more understandable and maintainable code. **"High testability is often a byproduct of excellent software architecture."**
 
-  ## 1.1 Bad Testable Design - (Author: Eleanor)
-  ### RemoveFiles() Method
-  In [Delete.java]() file, the [removeFiles()]() method contains hardcoded dependencies and hidden state, making it a bad testable design:
+  ## **1.1 Bad Testable Design - (Author: Eleanor)**
+  ### **RemoveFiles() Method Intro**
+  In [`Delete.java`](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/84881f778a2bf4dcad79f847f2d6948b289e6554/src/main/org/apache/tools/ant/taskdefs/Delete.java) file, the [`removeFiles()`](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/84881f778a2bf4dcad79f847f2d6948b289e6554/src/main/org/apache/tools/ant/taskdefs/Delete.java#L871-L909) method contains hardcoded dependencies and hidden state, making it a bad testable design:
 
   ```java
   protected void removeFiles(File d, String[] files, String[] dirs) {
@@ -1038,10 +1038,10 @@ The new test class `CarolExecuteOnTest` was designed to be a functional verifica
                       dirCount++;
                   }
       // [skip...]
-  }
+  }}}}
   ```
 
-  ### What would be prevented with the code?
+  ### **What would be prevented with the code?**
   * **Loss of Controllability**  
     * `new File()` and `currDir.list()` interact directly with the physical hard drive, we cannot easily simulate edge cases in a unit test. Like when `currDir.list()` returns `null`
 
@@ -1052,10 +1052,10 @@ The new test class `CarolExecuteOnTest` was designed to be a functional verifica
   * **Loss of Observability**: 
     * The `log()` and `handle()` methods rely on implicit internal states (like `quiet`, `verbosity`). These methods push strings into Ant's hidden `Project` system or silently swallow errors, make it impossible to intercept and assert side effects.
 
-  ### How to fix
-  To fix the code, we apply the Dependency Injection (DI) principle to decouple the method from physical I/O and hidden state in a new file [DeleteTestable]().
+  ### **How to fix**
+  To fix the code, we apply the Dependency Injection (DI) principle to decouple the method from physical I/O and hidden state in a new file [`DeleteTestable.java`](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/84881f778a2bf4dcad79f847f2d6948b289e6554/src/main/org/apache/tools/ant/taskdefs/DeleteTestable.java).
 
-  * **Add [`FileSystemD`]() interface**: Instead of calling `new File()` and `list()`, inject this interface so we can supply a in-memory "Stub File System" during testing.
+  * **Add [`FileSystemD`](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/84881f778a2bf4dcad79f847f2d6948b289e6554/src/main/org/apache/tools/ant/taskdefs/DeleteTestable.java#L5-L9) interface**: Instead of calling `new File()` and `list()`, inject this interface so we can supply a in-memory "Stub File System" during testing.
     ```java
     interface FileSystemD {
       File setFile(File parent, String childName);
@@ -1064,7 +1064,7 @@ The new test class `CarolExecuteOnTest` was designed to be a functional verifica
     }
     ```
 
-  * **Add [`TaskObserver`]() (Log/ErrorHandler) interface**: Pass the side-effects to an injected observer, we can easily capture and assert the generated messages during testing.
+  * **Add [`TaskObserver`](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/84881f778a2bf4dcad79f847f2d6948b289e6554/src/main/org/apache/tools/ant/taskdefs/DeleteTestable.java#L11-L14) (Log/ErrorHandler) interface**: Pass the side-effects to an injected observer, we can easily capture and assert the generated messages during testing.
     ```java
     interface TaskObserver {
       void logInfo(String message);
@@ -1072,9 +1072,9 @@ The new test class `CarolExecuteOnTest` was designed to be a functional verifica
     }
     ```
 
-  ### Implement Test Case - [DeleteTDTest.java]()
+  ### **Implement Test Case - [`DeleteTDTest.java`](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/84881f778a2bf4dcad79f847f2d6948b289e6554/src/tests/junit/org/apache/tools/ant/taskdefs/DeleteTDTest.java)**
   In the `@Before` setup method, we implement:
-  * The Stub ([FileSystemD()]()): Implement an anonymous class that acts as a mock file system. It is hardcoded to respond to specific string inputs.
+  * **The Stub - [`FileSystemD()`](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/84881f778a2bf4dcad79f847f2d6948b289e6554/src/tests/junit/org/apache/tools/ant/taskdefs/DeleteTDTest.java#L36-L65)**: Implement an anonymous class that acts as a mock file system. It is hardcoded to respond to specific string inputs.
     ```java
     public void setUp() {
         task = new DeleteTestable();
@@ -1114,7 +1114,7 @@ The new test class `CarolExecuteOnTest` was designed to be a functional verifica
         };
     }
     ```
-  * The Spy ([SpyObserver()]()): Create a custom implementation that intercepts all `logInfo` and `handleErrorInfo` calls.
+  * **The Spy - [`SpyObserver()`](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/84881f778a2bf4dcad79f847f2d6948b289e6554/src/tests/junit/org/apache/tools/ant/taskdefs/DeleteTDTest.java#L19-L27)**: Create a custom implementation that intercepts all `logInfo` and `handleErrorInfo` calls.
     ```java
     class SpyObserver implements TaskObserver {
         public List<String> logs = new ArrayList<>();
@@ -1128,17 +1128,98 @@ The new test class `CarolExecuteOnTest` was designed to be a functional verifica
     ```
 
   **Test Cases Breakdown**
-  
+
   | Test Case | Scenario | Verification |
   | :-------- | :------- | :----------- |
-  | [testDeletesNormalFile()]() | Delete a standard file `normal.txt` | Asserts the Spy captured a log confirming the successful deletion of `normal.txt` |
-  | [testHandlesLockedFileError()]() | Delete a file `locked.txt` that can not be deleted | Asserts the system does not crash and the Spy captured a error containing the failure message of `locked.txt` |
-  | [testDeletesEmptyDir()]() | Delete an empty diectory `emptyDir` | Asserts the Spy captured a log confirming the successful deletion of `emptyDir` and summary log "Deleted 1 directory" |
-  | [testIgnoresNotEmptyDir()]() | Delete a non-empty diectory `notEmptyDir` that will be skiped | Asserts the method skips the directory. The Spy confirms no deletion logs were generated |
-  | [testHandlesLockedDirError()]() | Delete a diectory `lockedDir` that can not be deleted | Asserts the code enters the deletion block (logs the attempt), but catches the `false` return and triggers an "Unable to delete directory" error in the Spy. |
-  | [testHandlesNullDir()]() | Delete a diectory `nullDir` simulating an edge case where `File.list()` returns `null` |  Asserts the code handles the `null` without throwing a `NullPointerException`, treats it as an empty directory, and Spy captured a log confirming the successful deletion |
+  | **[`testDeletesNormalFile()`](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/84881f778a2bf4dcad79f847f2d6948b289e6554/src/tests/junit/org/apache/tools/ant/taskdefs/DeleteTDTest.java#L69-L76)** | Delete a standard file `normal.txt` | Asserts the Spy captured a log confirming the successful deletion of `normal.txt` |
+  | **[`testHandlesLockedFileError()`](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/84881f778a2bf4dcad79f847f2d6948b289e6554/src/tests/junit/org/apache/tools/ant/taskdefs/DeleteTDTest.java#L79-L86)** | Delete a file `locked.txt` that can not be deleted | Asserts the system does not crash and the Spy captured a error containing the failure message of `locked.txt` |
+  | **[`testDeletesEmptyDir()`](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/84881f778a2bf4dcad79f847f2d6948b289e6554/src/tests/junit/org/apache/tools/ant/taskdefs/DeleteTDTest.java#L89-L98)** | Delete an empty diectory `emptyDir` | Asserts the Spy captured a log confirming the successful deletion of `emptyDir` and summary log "Deleted 1 directory" |
+  | **[`testIgnoresNotEmptyDir()`](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/84881f778a2bf4dcad79f847f2d6948b289e6554/src/tests/junit/org/apache/tools/ant/taskdefs/DeleteTDTest.java#L101-L108)** | Delete a non-empty diectory `notEmptyDir` that will be skiped | Asserts the method skips the directory. The Spy confirms no deletion logs were generated |
+  | **[`testHandlesLockedDirError()`](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/84881f778a2bf4dcad79f847f2d6948b289e6554/src/tests/junit/org/apache/tools/ant/taskdefs/DeleteTDTest.java#L111-L123)** | Delete a diectory `lockedDir` that can not be deleted | Asserts the code enters the deletion block (logs the attempt), but catches the `false` return and triggers an "Unable to delete directory" error in the Spy. |
+  | **[`testHandlesNullDir()`](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/84881f778a2bf4dcad79f847f2d6948b289e6554/src/tests/junit/org/apache/tools/ant/taskdefs/DeleteTDTest.java#L126-L136)** | Delete a diectory `nullDir` simulating an edge case where `File.list()` returns `null` |  Asserts the code handles the `null` without throwing a `NullPointerException`, treats it as an empty directory, and Spy captured a log confirming the successful deletion |
 
+
+  ## **2. Mocking**
+
+  ## **Enviroment Set Up**
+  1. Downloaded the **mockito-core and 3 dependencies** via **[here](https://central.sonatype.com/artifact/org.mockito/mockito-core)**.
+
+  2. Placed `mockito-core-5.21.0.jar`, `byte-buddy-1.17.7.jar`, `byte-buddy-agent-1.17.7.jar` and `objenesis.jar` into `lib/optional`.
+
+  ## **2.1 Mocking - Single File Deletion (Author: Eleanor)**
+
+  ### **Feature Intro**
+  The `Delete` task provides a function to remove a single file in `execute()` specified by the `file` attribute. During execution, the task checks if the file exists first.
+  * If the file exists but is a directory, the task logs a message and skips the deletion.
+  * If the file exists and is a regular file, the task logs a message and attempts the deletion.
+  * If the deletion of that regular file fails, the task passes an error message to the `handle()` method.
+  * If the file does not exist and is not a dangling symlink, it logs a verbose message stating the file could not be found.
+  ```java
+  protected File file = null;
+
+  public void setFile(File file) {
+      this.file = file;
+  }
+  public void execute() throws BuildException {
+      // [skip...]
+
+      // delete the single file
+      if (file != null) {
+          if (file.exists()) {
+              if (file.isDirectory()) {
+                  log("Directory " + file.getAbsolutePath()
+                      + " cannot be removed using the file attribute.  Use dir instead.",
+                      quiet ? Project.MSG_VERBOSE : verbosity);
+              } else {
+                  log("Deleting: " + file.getAbsolutePath());
+
+                  if (!delete(file)) {
+                      handle("Unable to delete file " + file.getAbsolutePath());
+                  }
+              }
+          } else if (isDanglingSymlink(file)) {
+              // [skip...]
+          } else {
+              log("Could not find file " + file.getAbsolutePath()
+                  + " to delete.", quiet ? Project.MSG_VERBOSE : verbosity);
+          }
+      }
+    }
+  ```
+
+  ### **Why Mocking Necessary**
+  * Testing these execution branches without mocking requires the test suite to perform physical Disk I/O operations.
+
+  * It would require dynamically creating and deleting real temporary directories just to trigger the validation warning.
+
+  * Relying on the physical file system slows down test execution and can cause flaky tests.
+
+  ### **Behavior Checking Afforded by Mocking**
+  * By mocking the `java.io.File` object, we can instantly simulate different file states in memory.
+
+  * By mocking the Ant `Project` environment, we can perform behavior checking to verify that the task's internal control flow routes to the correct `if/else` branches and outputs the exact expected log messages without touching the hard drive.
+
+  ### **Implement Test Case using Mockito - [`DeleteMockTest.java`]()**
+  The following test suite, utilizes **Mockito** to strictly verify the internal behavior and control flow of the single-file deletion process.
+
+  **Technical Challenges**
+  * **`NullPointerException` Issue**: If a file does not exist, `Delete.java` then check if it's a broken symlink by calling `Files.isSymbolicLink(f.toPath())`. Mocking the Path interface resulted in a `NullPointerException`.
+
+  * **Solution**: Provided a real Path object via `Paths.get(...)` inside the `setUp()` method. This satisfies the Java standard library's internal requirements and prevents exceptions while still bypassing actual Disk I/O.
+
+  **Note**  
+  Ant's `Task.log(String, int)` internally delegates to `Project.log(Task, String, int)`. We structured our `verify()` statements using strict `eq()` matchers for all three parameters.
+
+  **Test Cases Breakdown**
+
+  | Test Case | Scenario | Verification |
+  | :-------- | :------- | :----------- |
+  | **[`testFileIsDir()`]()** | Delete when file is a directory | Verifies the deletion attempts are intercepted, logs correct message, and skip delete(). |
+  | **[`testFileNotExist()`]()** | Delete when file does not exist | Verifies non-exist files are handled with an log message and no delete() are triggered |
+  | **[`testFileIsNormal()`]()** | Delete a normal file | Verifies the delete() are triggered and logs the correct MSG_INFO message |
+  | **[`testFileCantDelete()`]()** | Fail to delete a file | Verifies the task routes the error to its internal handle() method, throwing a BuildException |
   
+    
 
 
 </details>
