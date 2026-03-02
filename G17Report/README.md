@@ -1038,7 +1038,7 @@ The new test class `CarolExecuteOnTest` was designed to be a functional verifica
                       dirCount++;
                   }
       // [skip...]
-  }
+  }}}}
   ```
 
   ### **What would be prevented with the code?**
@@ -1072,7 +1072,7 @@ The new test class `CarolExecuteOnTest` was designed to be a functional verifica
     }
     ```
 
-  ### **Implement Test Case - [DeleteTDTest.java](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/84881f778a2bf4dcad79f847f2d6948b289e6554/src/tests/junit/org/apache/tools/ant/taskdefs/DeleteTDTest.java)**
+  ### **Implement Test Case - [`DeleteTDTest.java`](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/84881f778a2bf4dcad79f847f2d6948b289e6554/src/tests/junit/org/apache/tools/ant/taskdefs/DeleteTDTest.java)**
   In the `@Before` setup method, we implement:
   * **The Stub - [`FileSystemD()`](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/84881f778a2bf4dcad79f847f2d6948b289e6554/src/tests/junit/org/apache/tools/ant/taskdefs/DeleteTDTest.java#L36-L65)**: Implement an anonymous class that acts as a mock file system. It is hardcoded to respond to specific string inputs.
     ```java
@@ -1141,6 +1141,11 @@ The new test class `CarolExecuteOnTest` was designed to be a functional verifica
 
   ## **2. Mocking**
 
+  ## **Enviroment Set Up**
+  1. Downloaded the **mockito-core and 3 dependencies** via **[here](https://central.sonatype.com/artifact/org.mockito/mockito-core)**.
+
+  2. Placed `mockito-core-5.21.0.jar`, `byte-buddy-1.17.7.jar`, `byte-buddy-agent-1.17.7.jar` and `objenesis.jar` into `lib/optional`.
+
   ## **2.1 Mocking - Single File Deletion (Author: Eleanor)**
 
   ### **Feature Intro**
@@ -1178,19 +1183,42 @@ The new test class `CarolExecuteOnTest` was designed to be a functional verifica
               log("Could not find file " + file.getAbsolutePath()
                   + " to delete.", quiet ? Project.MSG_VERBOSE : verbosity);
           }
+      }
     }
   ```
 
   ### **Why Mocking Necessary**
   * Testing these execution branches without mocking requires the test suite to perform physical Disk I/O operations.
+
   * It would require dynamically creating and deleting real temporary directories just to trigger the validation warning.
+
   * Relying on the physical file system slows down test execution and can cause flaky tests.
 
   ### **Behavior Checking Afforded by Mocking**
   * By mocking the `java.io.File` object, we can instantly simulate different file states in memory.
+
   * By mocking the Ant `Project` environment, we can perform behavior checking to verify that the task's internal control flow routes to the correct `if/else` branches and outputs the exact expected log messages without touching the hard drive.
 
-  ### **Implement Test Case using Mockito-
+  ### **Implement Test Case using Mockito - [`DeleteMockTest.java`]()**
+  The following test suite, utilizes **Mockito** to strictly verify the internal behavior and control flow of the single-file deletion process.
+
+  **Technical Challenges**
+  * **`NullPointerException` Issue**: If a file does not exist, `Delete.java` then check if it's a broken symlink by calling `Files.isSymbolicLink(f.toPath())`. Mocking the Path interface resulted in a `NullPointerException`.
+
+  * **Solution**: Provided a real Path object via `Paths.get(...)` inside the `setUp()` method. This satisfies the Java standard library's internal requirements and prevents exceptions while still bypassing actual Disk I/O.
+
+  **Note**  
+  Ant's `Task.log(String, int)` internally delegates to `Project.log(Task, String, int)`. We structured our `verify()` statements using strict `eq()` matchers for all three parameters.
+
+  **Test Cases Breakdown**
+
+  | Test Case | Scenario | Verification |
+  | :-------- | :------- | :----------- |
+  | **[`testFileIsDir()`]()** | Delete when file is a directory | Verifies the deletion attempts are intercepted, logs correct message, and skip delete(). |
+  | **[`testFileNotExist()`]()** | Delete when file does not exist | Verifies non-exist files are handled with an log message and no delete() are triggered |
+  | **[`testFileIsNormal()`]()** | Delete a normal file | Verifies the delete() are triggered and logs the correct MSG_INFO message |
+  | **[`testFileCantDelete()`]()** | Fail to delete a file | Verifies the task routes the error to its internal handle() method, throwing a BuildException |
+  
     
 
 
