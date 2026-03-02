@@ -134,7 +134,7 @@ public class DeleteTDTest {
             
         // 2. Verify it enters the second 'if' block and correctly calls the error handler
         assertTrue("Should handle error when lockedEmptyDir fails to delete.", 
-            spyObserver.errors.stream().anyMatch(err -> err.contains("Unable to delete directory") && err.contains("lockedEmptyDir")));
+            spyObserver.errors.stream().anyMatch(err -> err.contains("Unable to delete directory") && err.contains("lockedDir")));
     }
 
 
