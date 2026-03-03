@@ -1287,7 +1287,7 @@ The new test class `CarolExecuteOnTest` was designed to be a functional verifica
     }
   ```
 
-  ### **Implement Test Case - [TstampTDTest.java]()**
+  ### **Implement Test Case - [TstampTDTest.java](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/master/src/tests/junit/org/apache/tools/ant/taskdefs/TstampTDTest.java)**
   
   In our test method, we implement:
   - **The Stub** - `Date(0)`: We instantiate a deterministic `Date` object fixed to the Unix Epoch time (January 1, 1970). By passing this stub into our refactored method, we completely bypass the physical machine clock.
@@ -1309,9 +1309,10 @@ The new test class `CarolExecuteOnTest` was designed to be a functional verifica
   ### **Test Cases Breakdown**
   | Test Case | Scenario | Verification |
 | :-------- | :------- | :----------- |
-| **[`testRefactoredTstampWithDeterministicDate()`]()** | Execute the Tstamp logic using a mocked system clock (Epoch Time 0) | Asserts that the system successfully generated and injected the exact expected date string `19700101` without race conditions or flakiness. |
+| **[`testRefactoredTstampWithDeterministicDate()`](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/5926cb56297f7be3afaa7e65afd06d0ddb409126/src/tests/junit/org/apache/tools/ant/taskdefs/TstampTDTest.java#L42-L56)** | Execute the Tstamp logic using a mocked system clock (Epoch Time 0) | Asserts that the system successfully generated and injected the exact expected date string `19700101` without race conditions or flakiness. |
 
   ### **Test Result**
+  ![TstampTDTest_report](Image/TstampTDTest_report.png)
 
 
   ## **2. Mocking**
