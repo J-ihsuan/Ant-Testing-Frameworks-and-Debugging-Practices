@@ -1164,18 +1164,77 @@ The new test class `CarolExecuteOnTest` was designed to be a functional verifica
 
   ## **1.3 Implementation: Stubbing the InputHandler Interface - (Author: Chien-Tzu Yeh)**
   ### **Target Selection & Motivation**
-  To demonstrate testable design through stubbing, I targeted the [`Input`](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/master/src/main/org/apache/tools/ant/taskdefs/Input.java) task, which is responsible for prompting users for terminal input during build execution. From an architectural perspective, this class depends on an `InputHandler` that defaults to a standard console interaction. This design creates a testing bottleneck: testing this task directly is problematic because the default handler inherently blocks the execution thread indefinitely while waiting for a physical keyboard input signal. This makes it fundamentally incompatible with automated, headless CI/CD environments. To restore testability, I implemented an interface-based stub to decouple the task from this blocking console dependency.
+  To demonstrate testable design through stubbing, [`Input`](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/master/src/main/org/apache/tools/ant/taskdefs/Input.java) task was selected. This task is responsible for prompting users for terminal input during build execution. From an architectural perspective, this class depends on an [`InputHandler`](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/master/src/main/org/apache/tools/ant/input/InputHandler.java) that defaults to a standard console interaction. This design creates a testing bottleneck: testing this task directly is problematic because the default handler inherently blocks the execution thread indefinitely while waiting for a physical keyboard input signal. This makes it fundamentally incompatible with automated, headless CI/CD environments. To restore testability, I implemented an interface-based stub to decouple the task from this blocking console dependency.
 
   ### **Stub Implementation**
-  I implemented a custom test stub named `StubInputHandler` that implements the `org.apache.tools.ant.input.InputHandler` interface. Instead of delegating to standard I/O streams, I overrode the handleInput(InputRequest request) method to instantly inject a hardcoded string response into the request object.
+  A custom test stub named [`StubInputHandler`](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/e95d89f638b1a77b6f72fc44a7d18a8c2c088d00/src/tests/junit/org/apache/tools/ant/taskdefs/InputTaskStubTest.java#L29-L41) was implemented  to fulfill the `org.apache.tools.ant.input.InputHandler` interface. Instead of delegating to standard I/O streams, I overrode the handleInput(InputRequest request) method was overridden to instantly inject a hardcoded string response into the request object.
 
   ### **Test Case Execution**
-  I created a new test case, `testInputTaskUsesStubbedHandler()`, within a new test suite. In this test, I instantiated the `Input` task and deliberately replaced the project's default input handler with my `StubInputHandler` (initialized with the dummy response `"yes"`).
+  A new test case, [`testInputTaskUsesStubbedHandler()`](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/e95d89f638b1a77b6f72fc44a7d18a8c2c088d00/src/tests/junit/org/apache/tools/ant/taskdefs/InputTaskStubTest.java#L46-L62), was created within a new test suite. In the test, the  `Input` task is instantiated, and the project's default input handler is deliberately replaced with the `StubInputHandler` (initialized with the dummy response `"yes"`).
 
-  When `inputTask.execute()` is called, it triggers the stubbed method rather than the real blocking method. The test then successfully asserts that the Ant project property was updated with the stubbed value, proving that the task's internal assignment logic works correctly in complete isolation from the physical console.
+  When [`inputTask.execute()`](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/e95d89f638b1a77b6f72fc44a7d18a8c2c088d00/src/tests/junit/org/apache/tools/ant/taskdefs/InputTaskStubTest.java#L57) is called, it triggers the stubbed method rather than the real blocking method. The test then successfully asserts that the Ant project property was updated with the stubbed value, proving that the task's internal assignment logic works correctly in complete isolation from the physical console.
+
+  ### **Test Case Implementation**
+  
+  ```java
+  package org.apache.tools.ant.taskdefs;
+
+  import org.apache.tools.ant.BuildException;
+  import org.apache.tools.ant.Project;
+  import org.apache.tools.ant.input.InputHandler;
+  import org.apache.tools.ant.input.InputRequest;
+  import org.junit.Before;
+  import org.junit.Test;
+  import static org.junit.Assert.assertEquals;
+
+  public class InputTaskStubTest {
+
+      private Project project;
+      private Input inputTask;
+
+      @Before
+      public void setUp() {
+          project = new Project();
+          project.init();
+          inputTask = new Input();
+          inputTask.setProject(project);
+      }
+
+      // The Stub Implementation
+      private class StubInputHandler implements InputHandler {
+          private String hardcodedResponse;
+
+          public StubInputHandler(String hardcodedResponse) {
+              this.hardcodedResponse = hardcodedResponse;
+          }
+
+          @Override
+          public void handleInput(InputRequest request) throws BuildException {
+              request.setInput(hardcodedResponse);
+          }
+      }
+
+      // The Test Case
+      @Test
+      public void testInputTaskUsesStubbedHandler() {
+          inputTask.setMessage("Are you sure you want to deploy?");
+          inputTask.setAddproperty("deploy.confirmation");
+
+          // Inject the stub
+          project.setInputHandler(new StubInputHandler("yes"));
+          inputTask.execute();
+
+          // Verify the stubbed behavior
+          assertEquals("yes", project.getProperty("deploy.confirmation"));
+      }
+  }
+  ```
 
  ### **Test Execution Result**
+ The test suite was executed using the standard `Apache Ant` build process. As shown in the execution logs below, the `testInputTaskUsesStubbedHandler()` passed successfully without hanging the execution thread. This verifies that the stub implementation effectively bypassed the physical console dependency.
+ 
  ![InputTaskStubTest](Image/InputTaskStubTest_success.png)
+
 
   ## **2. Mocking**
 
@@ -1184,9 +1243,11 @@ The new test class `CarolExecuteOnTest` was designed to be a functional verifica
 
   2. Placed `mockito-core-5.21.0.jar`, `byte-buddy-1.17.7.jar`, `byte-buddy-agent-1.17.7.jar` and `objenesis-3.3.jar` into `lib/optional`.
 
+  ## **2.1 Overview of Mocking and Its Utility**
+  Mocking is a testing technique used to isolate the system under test (SUT) by replacing its external dependencies with programmable proxy objects (mocks). Its primary utility lies in enabling **Behavior Verification**. While traditional stubs are used to provide pre-programmed responses (State Verification), mocks are explicitly designed to verify the interactions between objects—such as checking if a specific method was called, how many times it was called, and with what exact parameters. This allows developers to test complex, event-driven, or side-effect-heavy logic without setting up heavy external environments (e.g., databases, network servers, or complex system listeners).
 
 
-  ## **2.1 Mocking - Single File Deletion (Author: Eleanor)**
+  ## **2.2 Mocking - Single File Deletion (Author: Eleanor)**
 
   ### **Feature Intro**
   The `Delete` task provides a function to remove a single file in `execute()` specified by the `file` attribute. During execution, the task checks if the file exists first.
@@ -1270,7 +1331,22 @@ The new test class `CarolExecuteOnTest` was designed to be a functional verifica
   ```
   ![](Image/DeleteMockTestReport.png)
   
-    
+
+  ## **2.3 Mocking - File Copying (Author: Chien-Tzu Yeh)**
+  ### **Feature Intro**
+  The `Copy` task provides functionality to duplicate files or directories. During the `execute()` phase, the task performs rigorous validation on the source file specified by the `file` attribute.
+
+  - If the source file exists, it proceeds with the copying process.
+
+  - If the source file does not exist, the task checks the `failonerror` flag.
+
+  - If `failonerror` is true, it throws a `BuildException`.
+
+  - If `failonerror` is false, it logs a warning message stating the file could not be found and gracefully skips the operation.
+
+  **Test Result**
+  ![CopyMockTest](Image/CopyMockTest_success.png)
+
 
 
 </details>
