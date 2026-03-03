@@ -1236,6 +1236,84 @@ The new test class `CarolExecuteOnTest` was designed to be a functional verifica
  ![InputTaskStubTest](Image/InputTaskStubTest_success.png)
 
 
+  ## **1.4 Bad Testable Design - (Author: Chien-Tzu Yeh)**
+  ### **Execute() Method Intro**
+  In the [`Tstamp.java`](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/master/src/main/org/apache/tools/ant/taskdefs/Tstamp.java) file, the [`execute()`](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/2e875b64c5b825fb76dd52b007019026cab54499/src/main/org/apache/tools/ant/taskdefs/Tstamp.java#L76-L109) method and its internal helper `getNow()` contain a hardcoded dependency on the system clock, making it a bad testable design:
+
+  ```java
+  public void execute() throws BuildException {
+      try {
+          // Bad Design 1: Hidden dependency on the system clock
+          Date d = getNow(); 
+          
+          // [skip...]
+          SimpleDateFormat dstamp = new SimpleDateFormat("yyyyMMdd");
+          
+          // Bad Design 2: Observability (Hidden State Property Assignment)
+          setProperty("DSTAMP", dstamp.format(d));
+          
+      } catch (Exception e) {
+          throw new BuildException(e);
+      }
+  }
+
+  protected Date getNow() {
+      // [skip...]
+      // Bad Design 3: Direct instantiation of the physical machine time
+      return now.orElseGet(Date::new);
+  }
+  ```
+  ### **What would be prevented with the code?**
+  - **Loss of Controllability:** `new Date()` interacts directly with the physical machine's internal clock. We cannot pause, rewind, or simulate specific edge-case dates (like Leap Years or Y2K) easily in a unit test.
+
+    - Because time is constantly moving, the generated output is fundamentally non-deterministic. A test run today will yield a different string than a test run tomorrow.
+
+  - **Loss of Observability:**
+
+    - The `setProperty()` pushes the generated time strings directly into Ant's hidden Project system. Asserting these side effects without causing flaky tests often forces developers to write fragile bounds-checking logic (e.g., verifying if the output time is within +/- 1 second of the test execution time).
+
+  ### **How to fix**
+  To fix the code, we apply the Dependency Injection (DI) principle to decouple the method from the physical system clock. We demonstrate this using a dummy refactored class `TstampTestable` within our test file.
+
+  - **Apply Method Parameter Injection:** Instead of the task internally calling `new Date()`, we inject the time dependency as a parameter. This allows us to supply an in-memory "Stub Clock" during testing.
+
+  ```java
+    class TstampTestable {
+    // [skip...]
+    public void executeWithDate(Date fixedDate) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+        project.setProperty("TODAY_DATE", sdf.format(fixedDate));
+      }
+    }
+  ```
+
+  ### **Implement Test Case - [TstampTDTest.java]()**
+  
+  In our test method, we implement:
+  - **The Stub** - `Date(0)`: We instantiate a deterministic `Date` object fixed to the Unix Epoch time (January 1, 1970). By passing this stub into our refactored method, we completely bypass the physical machine clock.
+
+  ```java
+  public void testRefactoredTstampWithDeterministicDate() {
+    TstampTestable task = new TstampTestable(project);
+
+    // Create a Stub Date (1970-01-01)
+    Date fixedDate = new Date(0); 
+
+    task.executeWithDate(fixedDate);
+
+    // Deterministic Assertion
+    assertEquals("19700101", project.getProperty("TODAY_DATE"));
+  }
+  ```
+
+  ### **Test Cases Breakdown**
+  | Test Case | Scenario | Verification |
+| :-------- | :------- | :----------- |
+| **[`testRefactoredTstampWithDeterministicDate()`]()** | Execute the Tstamp logic using a mocked system clock (Epoch Time 0) | Asserts that the system successfully generated and injected the exact expected date string `19700101` without race conditions or flakiness. |
+
+  ### **Test Result**
+
+
   ## **2. Mocking**
 
   ## **Enviroment Set Up**
@@ -1334,7 +1412,7 @@ The new test class `CarolExecuteOnTest` was designed to be a functional verifica
 
   ## **2.3 Mocking - File Copying (Author: Chien-Tzu Yeh)**
   ### **Feature Intro**
-  The `Copy` task provides functionality to duplicate files or directories. During the `execute()` phase, the task performs rigorous validation on the source file specified by the `file` attribute.
+  The [`Copy`](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/master/src/main/org/apache/tools/ant/taskdefs/Copy.java) task provides functionality to duplicate files or directories. During the [`execute()`](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/e95d89f638b1a77b6f72fc44a7d18a8c2c088d00/src/main/org/apache/tools/ant/taskdefs/Copy.java#L436-L613) phase, the task performs rigorous validation on the source file specified by the `file` attribute.
 
   - If the source file exists, it proceeds with the copying process.
 
@@ -1344,7 +1422,59 @@ The new test class `CarolExecuteOnTest` was designed to be a functional verifica
 
   - If `failonerror` is false, it logs a warning message stating the file could not be found and gracefully skips the operation.
 
-  **Test Result**
+  ```java
+  protected File file = null;
+  protected boolean failonerror = true;
+
+  public void setFile(File file) {
+      this.file = file;
+  }
+
+  public void execute() throws BuildException {
+      // [skip...]
+      if (file != null) {
+          if (file.exists()) {
+              // [skip... proceed to copy the file]
+          } else {
+              String message = "Warning: Could not find file " + file.getAbsolutePath() + " to copy.";
+              if (!failonerror) {
+                  log(message, Project.MSG_ERR);
+              } else {
+                  throw new BuildException(message);
+              }
+          }
+      }
+  }
+  ```
+
+  ### **Why Mocking Necessary**
+  - Testing these execution branches without mocking requires the test suite to perform physical Disk I/O operations.
+
+  - It would require ensuring specific files are definitively missing or unreadable on the host system to trigger the error handling.
+
+  - Relying on the physical file system slows down test execution and makes tests environment-dependent and flaky.
+
+  ### **Behavior Checking Afforded by Mocking**
+  - By mocking the `java.io.File` object, we can instantly simulate a non-existent file state (`exists()` returning `false`) in memory.
+
+  - By mocking the Ant `Project` environment, we can perform behavior checking to verify that the task's internal control flow gracefully handles the missing file and routes to the correct `log()` branch without crashing, all without touching the hard drive.
+
+  ### **Implement Test Case using Mockito** - [CopyMockTest.java](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/master/src/tests/junit/org/apache/tools/ant/taskdefs/CopyMockTest.java)
+  The following test suite utilizes **Mockito** to strictly verify the internal behavior and control flow of the file copying validation process.
+
+  ### **Technical Challenges**
+  - **`NullPointerException` Issue:** Similar to the `Delete` task, when the `Copy` task attempts to log the missing file, it invokes methods like `getAbsolutePath()` or resolves paths internally. Mocking a bare `File` object resulted in a `NullPointerException` during these logging operations.
+
+  - **Solution:** Provided dummy return values for `toPath()` and `getAbsolutePath()` via `Mockito.when(...)` during the setup. This satisfies the Java standard library's internal requirements and prevents exceptions while still bypassing actual Disk I/O.
+
+  **Note** Just like the `Delete` task, Ant's internal logging delegates to `Project.log(Task, String, int)`. We structured our `verify()` statements using strict `eq()` matchers to ensure the mock project received the exact log request from our task.
+
+  ### **Test Cases Breakdown**
+  | Test Case | Scenario | Verification |
+| :-------- | :------- | :----------- |
+| **[`testCopySourceFileDoesNotExist()`](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/2e875b64c5b825fb76dd52b007019026cab54499/src/tests/junit/org/apache/tools/ant/taskdefs/CopyMockTest.java#L29-L57)** | Attempt to copy a file that does not exist with `failonerror=false` | Verifies that `file.exists()` is called, and the task correctly intercepts the error to log a message instead of throwing an exception. |
+
+  ### **Test Result**
   ![CopyMockTest](Image/CopyMockTest_success.png)
 
 
