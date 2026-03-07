@@ -1483,7 +1483,20 @@ The new test class `CarolExecuteOnTest` was designed to be a functional verifica
 <details>
   <summary><H1> Part 6. Static Analyzers </H1></summary>
 
-  ## **1. Static Analysis**
+  ## **1. Static Analysis Tools**
+  Static analysis tools are designed to examine source code or compiled bytecode without actually executing the program.
+
+  * **Goals:**  
+    Identify potential vulnerabilities, logic bugs as early as possible in the software development lifecycle.
+
+  * **Purposes:**   
+    Automate the code review process and enforce consistent coding standards across a project. They serve as a first line of defense to detect architectural flaws, silent logic errors, memory leaks, and severe security vulnerabilities.
+
+  * **Use:**  
+    Static analyzers are typically utilized in two main ways. 
+    * **Integrated directly into a developer's IDE** to provide real-time feedback and highlight bad practices during the coding phase.
+
+    * **Embedded into CI/CD pipelines** to automatically scan every new commit or pull request, ensuring that no defective code is merged into the main production branch.
 
   ## **2. Overview & Number of Findings**
   * **CodeQL: 2,346 findings**
@@ -1492,13 +1505,13 @@ The new test class `CarolExecuteOnTest` was designed to be a functional verifica
   * **SpotBugs: 1,582 findings**
   ![](Image/SpotBugsOverview.png)
 
-  ## **3. Finding Dive in**
+  ## **3. Deep Dive into Selected Findings**
   ### **3.1 Warning: Implicit narrowing conversion in compound assignment #14 (Author: Eleanor)**
   * **Tool:** GitHub CodeQL
 
   * **Severity:** High
 
-  * **Location:** [TarBuffer.java:287]()
+  * **Location:** [TarBuffer.java:287](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/d634d744732acabeafb680041e5f3a760a7e164c/src/main/org/apache/tools/tar/TarBuffer.java#L287)
 
     ```java
     offset += numBytes;
@@ -1523,7 +1536,7 @@ The new test class `CarolExecuteOnTest` was designed to be a functional verifica
 
   * **Bug Rank**: 16 (Yellow)
 
-  * **Location:** [Rmic.java:733]()
+  * **Location:** [Rmic.java:733](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/d634d744732acabeafb680041e5f3a760a7e164c/src/main/org/apache/tools/ant/taskdefs/Rmic.java#L733)
 
     ```java
     oldFile.delete();
@@ -1531,10 +1544,10 @@ The new test class `CarolExecuteOnTest` was designed to be a functional verifica
 
   * **Description of the Warning**
 
-    SpotBugs identified that the return value of `java.io.File.delete()` is being ignored. Unlike many Java I/O methods that throw an `IOException` upon failure, `File.delete()` returns a `boolean` indicating success or failure. If not checking this return value, the program fails to handle situations when the file cannot be deleted.
+    SpotBugs identified that the return value of `java.io.File.delete()` is being ignored. Unlike many Java I/O methods that throw an `IOException` upon failure, `File.delete()` returns a `boolean` indicating success or failure. Without not checking this return value, the program fails to handle situations when the file cannot be deleted.
 
   * **Is this an actual problem?**
-    Yes, I think this is a problem. In the code, the developer is trying to simulate a **move operation** by copying the file first and then deleting the original. However, if `oldFile.delete()` fails, it just becomes a **copy operation**. Moreover, it fails silently. This will leave old files in the build directory. While it might not break the current build, these leftover files could mess up future build steps or waste your disk space. 
+    Yes, I think this is a problem. In the code, the developer is trying to simulate a **move operation** by copying the file first and then deleting the original. However, if `oldFile.delete()` fails, it just becomes a **copy operation**. Moreover, it fails silently. This will leave old files in the build directory. While it might not break the current build, these leftover files could mess up future build steps or waste disk space. 
     
   * **Recommendation**
     Wrap the delete() call in an if statement and print a warning log.
@@ -1553,7 +1566,7 @@ The new test class `CarolExecuteOnTest` was designed to be a functional verifica
 
   ### **Distinct Warnings vs. Overlapping Information**
 
-  Because of their different approaches, the warnings our team selected (3.2 `RV_RETURN_VALUE_IGNORED` by SpotBugs and 3.1 `Implicit narrowing conversion by CodeQL`) were entirely distinct and uniquely identified by their respective tools. SpotBugs caught a runtime logic flaw related to file I/O operations, while CodeQL caught a hidden compiler-level type casting issue. 
+  Because of their different approaches, the warnings our team selected (3.2 `RV_RETURN_VALUE_IGNORED` by SpotBugs and 3.1 `Implicit narrowing conversion` by CodeQL) were entirely distinct and uniquely identified by their respective tools. SpotBugs caught a runtime logic flaw related to file I/O operations, while CodeQL caught a hidden compiler-level type casting issue. 
 
   However, they do provide information that overlaps in nature, like Null Pointer Dereference. Interestingly, even when they identify the same risk, their descriptions reveal their fundamentally different purposes:
 
@@ -1562,6 +1575,13 @@ The new test class `CarolExecuteOnTest` was designed to be a functional verifica
   CodeQL identifies this simply as Dereferenced variable may be null. It approaches the problem via control-flow analysis, warning that the variable may hold a null value on "some execution paths" leading to the dereferencing.
 
   When they identify these similar warnings, the information provided is not always of equal value. SpotBugs provides a localized warning based on class structure. In contrast, CodeQL provides a highly valuable, step-by-step data flow visualization, tracing the exact execution path of the null value, making it easier to debug complex architectural flaws.
+
+  <table>
+    <tr>
+      <td><img src="Image/CodeQLCompare.png" width="100%"></td>
+      <td><img src="Image/SpotBugsCompare.png" width="100%"></td>
+    </tr>
+  </table>
 
   ### **Strengths and Weaknesses**
   **CodeQL**
