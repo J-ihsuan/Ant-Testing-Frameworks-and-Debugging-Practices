@@ -1541,7 +1541,49 @@ The new test class `CarolExecuteOnTest` was designed to be a functional verifica
 
   ![](Image/3.2_SpotBugs.png)
 
+  ## **4. Comparative Analysis: CodeQL vs. SpotBugs**
 
+  ### **Overview & Fundamental Purposes**   
+  CodeQL and SpotBugs are fundamentally different in their purposes and how they analyze the codebase.
+
+  * CodeQL performs semantic analysis on the **raw source code** by querying it like a database, focusing on **data flow** and **architectural vulnerabilities**.
+
+  * SpotBugs analyzes compiled Java `.class` files using predefined bug patterns, focusing on **Java-specific language quirks, API misuses**, and **localized bad practices**.
+
+
+  ### **Distinct Warnings vs. Overlapping Information**
+
+  Because of their different approaches, the warnings our team selected (3.2 `RV_RETURN_VALUE_IGNORED` by SpotBugs and 3.1 `Implicit narrowing conversion by CodeQL`) were entirely distinct and uniquely identified by their respective tools. SpotBugs caught a runtime logic flaw related to file I/O operations, while CodeQL caught a hidden compiler-level type casting issue. 
+
+  However, they do provide information that overlaps in nature, like Null Pointer Dereference. Interestingly, even when they identify the same risk, their descriptions reveal their fundamentally different purposes:
+
+  SpotBugs identifies this via the pattern `UWF_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR`. It approaches the problem from an object lifecycle perspective, warning that a field was never initialized in the constructor and is later dereferenced without a null check.
+
+  CodeQL identifies this simply as Dereferenced variable may be null. It approaches the problem via control-flow analysis, warning that the variable may hold a null value on "some execution paths" leading to the dereferencing.
+
+  When they identify these similar warnings, the information provided is not always of equal value. SpotBugs provides a localized warning based on class structure. In contrast, CodeQL provides a highly valuable, step-by-step data flow visualization, tracing the exact execution path of the null value, making it easier to debug complex architectural flaws.
+
+  ### **Strengths and Weaknesses**
+  **CodeQL**
+  * Strengths: 
+    * Cross-file data flow tracking 
+    * Uncovers deep semantic and security vulnerabilities
+    * Explains the "how" and "why" of a bug well
+    * Clear severity categorization 
+
+  * Weaknesses: 
+    * Slower analysis time because it requires building a database first
+    * Overcomplicate simple issues sometimes
+
+  **SpotBugs**
+  * Strengths:
+    * Fast execution
+    * Precise at catching Java-specific bad practices, threading issues, and API misuses
+
+  * Weaknesses: 
+    * Only analyzes compiled bytecode, project must build successfully before it can be scanned
+    * Lack of the deep, cross-file context that CodeQL provides
+    * Clunky categorization, forces developers to manually click and expand deeply nested tree structures one by one.
 
 
 </details>
