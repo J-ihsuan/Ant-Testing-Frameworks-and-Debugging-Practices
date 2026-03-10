@@ -1654,7 +1654,7 @@ The new test class `CarolExecuteOnTest` was designed to be a functional verifica
 
   - **SpotBugs** identifies this via the pattern `UWF_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR`. It approaches the problem from an object lifecycle perspective, warning that a field was never initialized in the constructor and is later dereferenced without a null check.
 
-  - **CodeQL** identifies this simply as Dereferenced variable may be null. It approaches the problem via control-flow analysis, warning that the variable may hold a null value on "some execution paths" leading to the dereferencing.
+  - **CodeQL** identifies this simply as `Dereferenced variable may be null`. It approaches the problem via control-flow analysis, warning that the variable may hold a null value on "some execution paths" leading to the dereferencing.
 
   When they identify these similar warnings, the information provided is not always of equal value. **SpotBugs** provides a localized warning based on class structure. In contrast, **CodeQL** provides a highly valuable, step-by-step data flow visualization, tracing the exact execution path of the null value, making it easier to debug complex architectural flaws.
 
