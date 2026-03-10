@@ -1553,6 +1553,7 @@ The new test class `CarolExecuteOnTest` was designed to be a functional verifica
     Yes, I think this is a problem. In the code, the developer is trying to simulate a **move operation** by copying the file first and then deleting the original. However, if `oldFile.delete()` fails, it just becomes a **copy operation**. Moreover, it fails silently. This will leave old files in the build directory. While it might not break the current build, these leftover files could mess up future build steps or waste disk space. 
     
   * **Recommendation**
+
     Wrap the delete() call in an if statement and print a warning log.
 
   ![](Image/3.2_SpotBugs.png)
@@ -1636,18 +1637,26 @@ The new test class `CarolExecuteOnTest` was designed to be a functional verifica
 
   ### **Distinct Warnings vs. Overlapping Information**
   #### **1. Fundamentally Different & Distinct Warnings**
-  Because of their different approaches, the warnings our team selected (3.2 `RV_RETURN_VALUE_IGNORED` by SpotBugs, 3.1 `Implicit narrowing conversion` and 3.3 `Zip Slip` by CodeQL, and 3.4 `EmptyCatchBlock` by PMD) were entirely distinct and uniquely identified by their respective tools. 
+  * **SpotBugs vs. CodeQL**
+
+    Because of their different approaches, the first set of warnings our team selected (3.2 `RV_RETURN_VALUE_IGNORED` by SpotBugs and 3.1 `Implicit narrowing conversion`) were entirely distinct and uniquely identified by their respective tools. 
   
-  **SpotBugs** caught a runtime logic flaw related to file I/O operations, **CodeQL** caught a hidden compiler-level type casting issue, and **PMD** caught a structural anti-pattern that violates coding best practices and silently degrades long-term maintainability.
+    **SpotBugs** caught a runtime logic flaw related to file I/O operations, **CodeQL** caught a hidden compiler-level type casting issue.
+  
+  * **PMD vs. CodeQL**
+
+    The second pair of warnings (3.3 `Zip Slip` by CodeQL and 3.4 `EmptyCatchBlock` by PMD) highlights different aspects of code quality.
+    
+    **CodeQL** identified a critical security vulnerability related to unsafe file extraction, whereas **PMD** caught a structural anti-pattern that violates coding best practices and silently degrades long-term maintainability.
 
   #### **2. Overlapping Information & Different Perspectives**
-  However, they do provide information that overlaps in nature, like "Null Pointer Dereference". Interestingly, even when they identify the same risk, their descriptions reveal their fundamentally different purposes:
-
   **CodeQL vs. SpotBugs**
+  
+  However, they do provide information that overlaps in nature, like "Null Pointer Dereference". Interestingly, even when they identify the same risk, their descriptions reveal their fundamentally different purposes:
 
   - **SpotBugs** identifies this via the pattern `UWF_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR`. It approaches the problem from an object lifecycle perspective, warning that a field was never initialized in the constructor and is later dereferenced without a null check.
 
-  - **CodeQL** identifies this simply as Dereferenced variable may be null. It approaches the problem via control-flow analysis, warning that the variable may hold a null value on "some execution paths" leading to the dereferencing.
+  - **CodeQL** identifies this simply as `Dereferenced variable may be null`. It approaches the problem via control-flow analysis, warning that the variable may hold a null value on "some execution paths" leading to the dereferencing.
 
   When they identify these similar warnings, the information provided is not always of equal value. **SpotBugs** provides a localized warning based on class structure. In contrast, **CodeQL** provides a highly valuable, step-by-step data flow visualization, tracing the exact execution path of the null value, making it easier to debug complex architectural flaws.
 
