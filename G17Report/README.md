@@ -1554,6 +1554,86 @@ The new test class `CarolExecuteOnTest` was designed to be a functional verifica
 
   ![](Image/3.2_SpotBugs.png)
 
+
+  ### **3.3 Warning: Arbitrary file access during archive extraction ("Zip Slip") #5 (Author: Chien-Tzu Yeh)**
+  * **Tool:** GitHub CodeQL
+
+  * **Severity:** High
+
+  * **Location:** [Expand.java](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/2b90c0da0971758576b14254164c8f45db6f9da5/src/main/org/apache/tools/ant/taskdefs/Expand.java#L199-L202)
+
+    ```java
+    extractFile(fileUtils, srcF, dir,
+            is = zf.getInputStream(ze), //NOSONAR
+            ze.getName(), new Date(ze.getTime()),
+            ze.isDirectory(), mapper);
+    ```
+  * **Description of the Warning**
+    
+    CodeQL flagged a critical security vulnerability known as "Zip Slip." This occurs when an application extracts an archive (like a `.zip` or `.tar` file) without properly sanitizing the file paths inside the archive. In the code above, `ze.getName()` retrieves the name of the ZipEntry directly from the archive and passes it to `extractFile`. An attacker can create a malicious archive containing file paths with directory traversal sequences (e.g., `../../../../etc/passwd`). If the application uses this unsanitized path, it will extract the file outside of the intended target directory (`dir`).
+
+  * **Is this an actual problem?**
+
+    Yes, I think this is a dangerous problem. If this Ant task is ever used to extract an archive provided by an untrusted source, an attacker could overwrite critical system files, modify executable code, or corrupt configurations. Because the program blindly trusts the file paths encoded within the zip file, it acts as a vector for arbitrary file overwrite, which often leads to Remote Code Execution (RCE). It is not a false positive.
+
+  * **Recommendation**
+
+    Before extracting the file, the code should be validated that the target file path remains strictly within the intended destination directory. This is typically done by resolving the **canonical path** of the target file and verifying that it starts with the canonical path of the destination folder. The program should throw a `SecurityException` if it doesn't.
+
+  ![](Image/ZipSlip.png)
+
+
+  ### **3.4 Correctness: Read of Unwritten Field (Potential NullPointerException in Teardown)(Author: Chien-Tzu Yeh)**
+
+  * **Tool:** SpotBugs
+
+  * **Bug Pattern**: `[NP] NP_UNWRITTEN_FIELD`
+
+  * **Location:** [InitializeClassTest.java:74-75](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/2b90c0da0971758576b14254164c8f45db6f9da5/src/tests/junit/org/apache/tools/ant/taskdefs/InitializeClassTest.java#L74-L75)
+
+  **Code Snippet:**
+  ```java
+
+    private File f1;
+    private File f2;
+
+    // ... (Initialization in @Before setUp() method) ...
+
+    @After
+    public void tearDown() {
+        f1.delete(); // Line 74: SpotBugs warning [NP]
+        f2.delete(); // Line 75: SpotBugs warning [NP]
+    }
+  ```
+
+  * **Description of the Warning**
+
+    SpotBugs flagged lines 74 and 75 for reading unwritten fields (`f1` and `f2`). While these fields are technically initialized in the `@Before` `setUp()` method, SpotBugs correctly identifies a potential risk based on the JUnit lifecycle. If an exception or assertion failure occurs early in the `setUp()` method (e.g., the `assertNotNull` check fails), the initialization of f1 and f2 will be skipped, leaving them as null. Because JUnit guarantees the execution of `@After` methods even if `@Before` or @Test fails, the `tearDown()` method will attempt to call `.delete()` on `null` references. This will throw a `NullPointerException`, which can mask the original test failure and make debugging difficult.
+  
+
+  * **Is this an actual problem?**
+    Yes, this is an actual problem, although it affects test maintainability and debugging efficiency rather than production code. In JUnit, the `@After` (teardown) method is guaranteed to execute even if the `@Before` (setup) method fails. If an error or assertion failure occurs early in the `setUp()` phase (for example, if the `assertNotNull` check fails), the variables `f1` and `f2` will remain uninitialized (null).
+
+    When `tearDown()` is subsequently invoked, executing `f1.delete()` will immediately throw a `NullPointerException`. The critical issue here is exception masking: this secondary `NullPointerException` will override and hide the original error that caused the setup to fail. Consequently, a developer reviewing the test logs will see a crash in the teardown phase instead of the actual root cause, making debugging significantly more confusing and time-consuming.
+    
+  * **Recommendation**
+    Add **null checks** before attempting to invoke methods on these fields in the teardown phase.
+
+    ```java
+    @After
+      public void tearDown() {
+          if (f1 != null) {
+              f1.delete();
+          }
+          if (f2 != null) {
+              f2.delete();
+          }
+      }
+    ```
+
+  ![](Image/[NP]ReadOfUnwrittenField.png)
+
+
   ## **4. Comparative Analysis: CodeQL vs. SpotBugs**
 
   ### **Overview & Fundamental Purposes**   
