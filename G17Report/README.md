@@ -1636,14 +1636,21 @@ The new test class `CarolExecuteOnTest` was designed to be a functional verifica
 
   ### **Distinct Warnings vs. Overlapping Information**
   #### **1. Fundamentally Different & Distinct Warnings**
-  Because of their different approaches, the warnings our team selected (3.2 `RV_RETURN_VALUE_IGNORED` by SpotBugs, 3.1 `Implicit narrowing conversion` and 3.3 `Zip Slip` by CodeQL, and 3.4 `EmptyCatchBlock` by PMD) were entirely distinct and uniquely identified by their respective tools. 
+  * **SpotBugs vs. CodeQL**
+
+    Because of their different approaches, the first set of warnings our team selected (3.2 `RV_RETURN_VALUE_IGNORED` by SpotBugs and 3.1 `Implicit narrowing conversion`) were entirely distinct and uniquely identified by their respective tools. 
   
-  **SpotBugs** caught a runtime logic flaw related to file I/O operations, **CodeQL** caught a hidden compiler-level type casting issue, and **PMD** caught a structural anti-pattern that violates coding best practices and silently degrades long-term maintainability.
+    **SpotBugs** caught a runtime logic flaw related to file I/O operations, **CodeQL** caught a hidden compiler-level type casting issue.
+  
+  * **PMD vs. CodeQL**
+
+    The second pair of warnings (3.3 `Zip Slip` by CodeQL and 3.4 `EmptyCatchBlock` by PMD) highlights different aspects of code quality.
+    
+    **CodeQL** identified a critical security vulnerability related to unsafe file extraction, whereas **PMD** caught a structural anti-pattern that violates coding best practices and silently degrades long-term maintainability.
 
   #### **2. Overlapping Information & Different Perspectives**
-  However, they do provide information that overlaps in nature, like "Null Pointer Dereference". Interestingly, even when they identify the same risk, their descriptions reveal their fundamentally different purposes:
-
   **CodeQL vs. SpotBugs**
+  However, they do provide information that overlaps in nature, like "Null Pointer Dereference". Interestingly, even when they identify the same risk, their descriptions reveal their fundamentally different purposes:
 
   - **SpotBugs** identifies this via the pattern `UWF_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR`. It approaches the problem from an object lifecycle perspective, warning that a field was never initialized in the constructor and is later dereferenced without a null check.
 
