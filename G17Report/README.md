@@ -1505,6 +1505,9 @@ The new test class `CarolExecuteOnTest` was designed to be a functional verifica
   * **SpotBugs: 1,582 findings**
   ![](Image/SpotBugsOverview.png)
 
+  * **PMD: 2,491 findings**
+  ![](Image/pmdOverview.png)
+
   ## **3. Deep Dive into Selected Findings**
   ### **3.1 Warning: Implicit narrowing conversion in compound assignment #14 (Author: Eleanor)**
   * **Tool:** GitHub CodeQL
@@ -1580,81 +1583,73 @@ The new test class `CarolExecuteOnTest` was designed to be a functional verifica
 
     Before extracting the file, the code should be validated that the target file path remains strictly within the intended destination directory. This is typically done by resolving the **canonical path** of the target file and verifying that it starts with the canonical path of the destination folder. The program should throw a `SecurityException` if it doesn't.
 
-  ![](Image/ZipSlip.png)
+    ![](Image/ZipSlip.png)
 
 
-  ### **3.4 Correctness: Read of Unwritten Field (Potential NullPointerException in Teardown)(Author: Chien-Tzu Yeh)**
+  ### **3.4 Warning: Avoid empty catch blocks ("EmptyCatchBlock") (Author: Chien-Tzu Yeh)**
 
-  * **Tool:** SpotBugs
+  * **Tool:** PMD
 
-  * **Bug Pattern**: `[NP] NP_UNWRITTEN_FIELD`
+  * **Bug Pattern**: Error Prone - EmptyCatchBlock
 
-  * **Location:** [InitializeClassTest.java:74-75](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/2b90c0da0971758576b14254164c8f45db6f9da5/src/tests/junit/org/apache/tools/ant/taskdefs/InitializeClassTest.java#L74-L75)
+  * **Location:** [AntClassLoader.java:91-97](https://github.com/J-ihsuan/Ant-Testing-Frameworks-and-Debugging-Practices/blob/f0edbf5f94367633149821d9a9afc5f1b16787fa/src/main/org/apache/tools/ant/AntClassLoader.java#L91-L97)
 
-  **Code Snippet:**
-  ```java
-
-    private File f1;
-    private File f2;
-
-    // ... (Initialization in @Before setUp() method) ...
-
-    @After
-    public void tearDown() {
-        f1.delete(); // Line 74: SpotBugs warning [NP]
-        f2.delete(); // Line 75: SpotBugs warning [NP]
-    }
-  ```
+  * **Code Snippet:**
+    ```java
+    try {
+                final Class<?> runtimeVersionClass = Class.forName("java.lang.Runtime$Version");
+                ctorArgs = new Class[] {File.class, boolean.class, int.class, runtimeVersionClass};
+                runtimeVersionVal = Runtime.class.getDeclaredMethod("version").invoke(null);
+            } catch (Exception e) {
+                // ignore - we consider this as multi-release jar unsupported
+            }
+    ```
 
   * **Description of the Warning**
 
-    SpotBugs flagged lines 74 and 75 for reading unwritten fields (`f1` and `f2`). While these fields are technically initialized in the `@Before` `setUp()` method, SpotBugs correctly identifies a potential risk based on the JUnit lifecycle. If an exception or assertion failure occurs early in the `setUp()` method (e.g., the `assertNotNull` check fails), the initialization of f1 and f2 will be skipped, leaving them as null. Because JUnit guarantees the execution of `@After` methods even if `@Before` or @Test fails, the `tearDown()` method will attempt to call `.delete()` on `null` references. This will throw a `NullPointerException`, which can mask the original test failure and make debugging difficult.
+    PMD flagged an "Error Prone" warning known as `EmptyCatchBlock`. This occurs when an application uses a `try-catch` block to handle a potential exception, but leaves the `catch` block entirely empty. In the code snippet above, the developer attempts to load Java 9+ specific classes via reflection. If this fails (e.g., because it's running on an older Java version), an `Exception` is thrown and caught, but no programmatic action is taken inside the catch block.
   
 
   * **Is this an actual problem?**
-    Yes, this is an actual problem, although it affects test maintainability and debugging efficiency rather than production code. In JUnit, the `@After` (teardown) method is guaranteed to execute even if the `@Before` (setup) method fails. If an error or assertion failure occurs early in the `setUp()` phase (for example, if the `assertNotNull` check fails), the variables `f1` and `f2` will remain uninitialized (null).
 
-    When `tearDown()` is subsequently invoked, executing `f1.delete()` will immediately throw a `NullPointerException`. The critical issue here is exception masking: this secondary `NullPointerException` will override and hide the original error that caused the setup to fail. Consequently, a developer reviewing the test logs will see a crash in the teardown phase instead of the actual root cause, making debugging significantly more confusing and time-consuming.
+    In this specific instance within the Ant code, it is more of a **Code Smell** rather than a critical bug. The developer intentionally swallowed the exception because failing to find Java 9 classes simply means they should fall back to standard behavior. However, from a broader software engineering perspective, this anti-pattern is an actual problem for maintainability. When an exception is "swallowed" without logging (a "silent failure"), it hides potential issues from developers. While the comment `// ignore...` explains the intent, relying on an empty block is dangerous. If a completely unrelated exception occurs (e.g., an unexpected `SecurityException` during reflection), it will be silently buried, making future debugging incredibly difficult.
     
   * **Recommendation**
-    Add **null checks** before attempting to invoke methods on these fields in the teardown phase.
 
-    ```java
-    @After
-      public void tearDown() {
-          if (f1 != null) {
-              f1.delete();
-          }
-          if (f2 != null) {
-              f2.delete();
-          }
-      }
-    ```
+    At a minimum, the code inside the catch block should log a debug-level message. This ensures that developers have a trail to follow if something unexpected fails. Alternatively, catching a broad `Exception` should be avoided; the code should specifically catch `ClassNotFoundException` or `NoSuchMethodException` so that only the expected errors are ignored, while other critical exceptions are allowed to propagate or be properly logged.
 
-  ![](Image/[NP]ReadOfUnwrittenField.png)
+    
+    ![EptyCatchBlockError](Image/EmptyCatchBlockError.png)
 
 
-  ## **4. Comparative Analysis: CodeQL vs. SpotBugs**
+  ## **4. Comparative Analysis: CodeQL vs. SpotBugs vs PMD**
 
-  ### **Overview & Fundamental Purposes**   
-  CodeQL and SpotBugs are fundamentally different in their purposes and how they analyze the codebase.
+  ### **Overview & Fundamental Purposes**
+  CodeQL, SpotBugs, and PMD are fundamentally different in their purposes and how they analyze the codebase.
 
   * CodeQL performs semantic analysis on the **raw source code** by querying it like a database, focusing on **data flow** and **architectural vulnerabilities**.
 
   * SpotBugs analyzes compiled Java `.class` files using predefined bug patterns, focusing on **Java-specific language quirks, API misuses**, and **localized bad practices**.
 
+  * PMD operates directly on the **raw source code** by building an Abstract Syntax Tree (AST). Its primary purpose is acting as a strict linter, focusing on **code quality, technical debt, coding standards, and maintainability** (e.g., Code Smells).
+
 
   ### **Distinct Warnings vs. Overlapping Information**
+  #### **1. Fundamentally Different & Distinct Warnings**
+  Because of their different approaches, the warnings our team selected (3.2 `RV_RETURN_VALUE_IGNORED` by SpotBugs, 3.1 `Implicit narrowing conversion` and 3.3 `Zip Slip` by CodeQL, and 3.4 `EmptyCatchBlock` by PMD) were entirely distinct and uniquely identified by their respective tools. 
+  
+  **SpotBugs** caught a runtime logic flaw related to file I/O operations, **CodeQL** caught a hidden compiler-level type casting issue, and **PMD** caught a structural anti-pattern that violates coding best practices and silently degrades long-term maintainability.
 
-  Because of their different approaches, the warnings our team selected (3.2 `RV_RETURN_VALUE_IGNORED` by SpotBugs and 3.1 `Implicit narrowing conversion` by CodeQL) were entirely distinct and uniquely identified by their respective tools. SpotBugs caught a runtime logic flaw related to file I/O operations, while CodeQL caught a hidden compiler-level type casting issue. 
+  #### **2. Overlapping Information & Different Perspectives**
+  However, they do provide information that overlaps in nature, like "Null Pointer Dereference". Interestingly, even when they identify the same risk, their descriptions reveal their fundamentally different purposes:
 
-  However, they do provide information that overlaps in nature, like Null Pointer Dereference. Interestingly, even when they identify the same risk, their descriptions reveal their fundamentally different purposes:
+  **CodeQL vs. SpotBugs**
 
-  SpotBugs identifies this via the pattern `UWF_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR`. It approaches the problem from an object lifecycle perspective, warning that a field was never initialized in the constructor and is later dereferenced without a null check.
+  - **SpotBugs** identifies this via the pattern `UWF_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR`. It approaches the problem from an object lifecycle perspective, warning that a field was never initialized in the constructor and is later dereferenced without a null check.
 
-  CodeQL identifies this simply as Dereferenced variable may be null. It approaches the problem via control-flow analysis, warning that the variable may hold a null value on "some execution paths" leading to the dereferencing.
+  - **CodeQL** identifies this simply as Dereferenced variable may be null. It approaches the problem via control-flow analysis, warning that the variable may hold a null value on "some execution paths" leading to the dereferencing.
 
-  When they identify these similar warnings, the information provided is not always of equal value. SpotBugs provides a localized warning based on class structure. In contrast, CodeQL provides a highly valuable, step-by-step data flow visualization, tracing the exact execution path of the null value, making it easier to debug complex architectural flaws.
+  When they identify these similar warnings, the information provided is not always of equal value. **SpotBugs** provides a localized warning based on class structure. In contrast, **CodeQL** provides a highly valuable, step-by-step data flow visualization, tracing the exact execution path of the null value, making it easier to debug complex architectural flaws.
 
   <table>
     <tr>
@@ -1662,6 +1657,30 @@ The new test class `CarolExecuteOnTest` was designed to be a functional verifica
       <td><img src="Image/SpotBugsCompare.png" width="100%"></td>
     </tr>
   </table>
+
+  **CodeQL vs. PWD**
+
+  Similarly, PMD and CodeQL also provide overlapping information regarding dead code, such as an **"Unused Local Variable"** or **"Unused Private Field."** Even though both tools flag the exact same unused variable, their underlying mechanisms reveal their different purposes:
+  - **PMD** identifies this via rules like UnusedLocalVariable. It approaches the problem purely from a syntactic perspective (AST Analysis). It simply checks the Abstract Syntax Tree (AST) to see if a variable is declared within a scope but lacks any reference nodes. Its goal is immediate code cleanup and enforcing stylistic hygiene.
+
+  - **CodeQL** identifies this via semantic queries. It approaches the problem through data-flow and reachability analysis. It constructs a control flow graph to determine if the variable's value is ever actually "read" or impacts the program's output on any execution path. Its goal is identifying logical dead-ends or inefficient memory allocation.
+  <table>
+    <tr>
+      <td><img src="Image/PMDUnused.png" width="100%"></td>
+      <td><img src="Image/CodeQLUnused.png" width="100%"></td>
+    </tr>
+  </table>
+
+  Because of these fundamental differences, they also identify entirely distinct warnings that the other tool completely ignores:
+
+  - **Why CodeQL ignores PMD's warnings (e.g., `UselessParentheses`)**: 
+  
+    PMD flagged a `UselessParentheses` warning in our code (a purely stylistic issue). CodeQL completely ignores this because extra parentheses do not change the compiled bytecode, control flow, or security state of the application. CodeQL focuses on application logic, not cosmetic code style.
+
+  - **Why PMD misses CodeQL's warnings (e.g., `Zip Slip`)**: 
+    
+    As discussed earlier, CodeQL caught the critical `Zip Slip` vulnerability. PMD cannot catch this because identifying Zip Slip requires cross-file taint analysis (tracking malicious input from a source to a vulnerable sink). PMD only analyzes the syntax tree of a single file at a time and lacks the deep data-flow awareness needed to find architectural security flaws.
+  
 
   ### **Strengths and Weaknesses**
   **CodeQL**
@@ -1685,5 +1704,16 @@ The new test class `CarolExecuteOnTest` was designed to be a functional verifica
     * Lack of the deep, cross-file context that CodeQL provides
     * Clunky categorization, forces developers to manually click and expand deeply nested tree structures one by one.
 
+  **PMD**
+  * Strengths:
+    * Analyzes raw source code directly; does not require a successful build to scan (unlike SpotBugs)
+    * Excellent at catching code smells, stylistic issues (e.g., unused variables), and naming convention violations
+    * Features a powerful Copy/Paste Detector (CPD) to identify duplicated or highly similar code blocks
+    * Highly customizable rules via XPath or Java for enforcing team-specific standards
+
+  * Weaknesses: 
+    * Shallow analysis depth; relies primarily on Abstract Syntax Trees (AST) and lacks the deep, cross-file data flow tracking of CodeQL
+    * Prone to high rates of false positives, which can cause "alert fatigue" if rulesets are not strictly tuned
+    * Focuses mostly on surface-level flaws and syntax, making it weak at uncovering deep logical errors or complex security vulnerabilities
 
 </details>

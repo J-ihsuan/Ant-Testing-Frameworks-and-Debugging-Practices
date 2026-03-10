@@ -85,7 +85,7 @@
       <filter>../../../../target/ant/.build.timestamp.properties</filter>
     </filters>
     <plugins>
-      <plugin>
+          <plugin>
         <artifactId>maven-antrun-plugin</artifactId>
         <executions>
           <execution>
